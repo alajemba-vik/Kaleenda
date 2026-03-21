@@ -1,0 +1,18 @@
+node_modules/
+dist/
+
+# Environment files (keep sample template committed)
+.env
+.env.*
+!.env.example
+
+# Build/cache artifacts
+*.tsbuildinfo
+.vite/
+coverage/
+
+# Local tooling and editor files
+.vercel/
+.idea/
+.DS_Store
+*.log

@@ -1,0 +1,168 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.w { padding: 1rem 0; font-family: var(--font-sans, sans-serif); }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.tab { background: transparent; border: 0.5px solid var(--color-border-secondary); border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; color: var(--color-text-secondary); transition: all .15s; }
+.tab.on { background: var(--color-background-secondary); border-color: var(--color-border-primary); color: var(--color-text-primary); font-weight: 500; }
+.stepper { display: flex; align-items: flex-start; margin-bottom: 1.25rem; }
+.si { display: flex; flex-direction: column; align-items: stretch; flex: 1; cursor: pointer; }
+.sr { display: flex; align-items: center; }
+.sd { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-tertiary); flex-shrink: 0; transition: all .15s; }
+.sd.on { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.sl { flex: 1; height: 0.5px; background: var(--color-border-secondary); }
+.slabel { font-size: 10px; color: var(--color-text-tertiary); margin-top: 4px; text-align: center; line-height: 1.3; padding: 0 2px; }
+.slabel.on { color: var(--color-text-secondary); }
+.screen { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; overflow: hidden; }
+.sbar { background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); padding: 7px 10px; display: flex; align-items: center; gap: 4px; }
+.sbd { width: 7px; height: 7px; border-radius: 50%; background: var(--color-border-secondary); }
+.surl { font-size: 10px; color: var(--color-text-tertiary); margin-left: 8px; font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sbody { padding: 1rem 1.1rem; }
+.note { background: var(--color-background-secondary); padding: 8px 12px; font-size: 12px; color: var(--color-text-secondary); margin-top: 0; line-height: 1.5; border-top: 0.5px solid var(--color-border-tertiary); }
+.nav { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.nb { background: transparent; border: 0.5px solid var(--color-border-secondary); border-radius: 8px; padding: 5px 14px; font-size: 12px; cursor: pointer; color: var(--color-text-secondary); transition: all .15s; }
+.nb:hover:not(:disabled) { background: var(--color-background-secondary); }
+.nb.p { background: var(--color-text-primary); color: var(--color-background-primary); border-color: transparent; }
+.nb:disabled { opacity: 0.2; cursor: default; }
+.sc { font-size: 11px; color: var(--color-text-tertiary); }
+.stitle { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 5px; }
+.ssub { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 12px; line-height: 1.5; }
+.inp { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 8px; width: 100%; display: block; }
+.btn { display: inline-block; background: var(--color-text-primary); color: var(--color-background-primary); border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 500; margin-right: 6px; margin-bottom: 6px; }
+.btn2 { display: inline-block; border: 0.5px solid var(--color-border-secondary); border-radius: 8px; padding: 7px 14px; font-size: 13px; color: var(--color-text-secondary); margin-right: 6px; margin-bottom: 6px; }
+.cbox { border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+.cw { background: #E6F1FB; border: 0.5px solid #B5D4F4; }
+.cr2 { background: #EAF3DE; border: 0.5px solid #C0DD97; }
+.clbl { font-size: 10px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 4px; }
+.cw .clbl { color: #185FA5; }
+.cr2 .clbl { color: #3B6D11; }
+.cval { font-size: 18px; font-weight: 500; letter-spacing: .18em; font-family: var(--font-mono); }
+.cw .cval { color: #0C447C; }
+.cr2 .cval { color: #27500A; }
+.divx { height: 0.5px; background: var(--color-border-tertiary); margin: 10px 0; }
+.cal { border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; overflow: hidden; margin-bottom: 8px; }
+.calh { background: var(--color-background-secondary); padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.calg { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; background: var(--color-border-tertiary); }
+.cd { background: var(--color-background-primary); padding: 3px 4px; font-size: 10px; color: var(--color-text-tertiary); text-align: center; min-height: 28px; }
+.cdev { color: var(--color-text-primary); }
+.cev { font-size: 9px; background: #E6F1FB; color: #0C447C; border-radius: 3px; padding: 1px 3px; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bw { background: #E6F1FB; color: #185FA5; border-radius: 20px; padding: 1px 8px; font-size: 11px; font-weight: 500; display: inline-block; }
+.br { background: #EAF3DE; color: #3B6D11; border-radius: 20px; padding: 1px 8px; font-size: 11px; font-weight: 500; display: inline-block; }
+.bo { background: #EEEDFE; color: #3C3489; border-radius: 20px; padding: 1px 8px; font-size: 11px; font-weight: 500; display: inline-block; }
+.succ { background: #EAF3DE; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.sdot { width: 6px; height: 6px; border-radius: 50%; background: #3B6D11; flex-shrink: 0; }
+.stext { font-size: 13px; color: #27500A; }
+.lsr { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.lsicon { width: 24px; height: 24px; border-radius: 5px; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.lskey { font-size: 11px; color: var(--color-text-secondary); font-family: var(--font-mono); }
+.lsval { font-size: 11px; color: var(--color-text-primary); font-family: var(--font-mono); margin-left: auto; }
+.chk { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.chkbox { width: 14px; height: 14px; border: 0.5px solid var(--color-border-secondary); border-radius: 3px; background: var(--color-background-secondary); flex-shrink: 0; }
+.cmon { background: var(--color-background-secondary); border-radius: 8px; padding: 10px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); margin-bottom: 12px; line-height: 1.9; }
+</style>
+<div class="w">
+  <div class="tabs" id="tabs"></div>
+  <div class="stepper" id="stepper"></div>
+  <div class="screen">
+    <div class="sbar">
+      <div class="sbd"></div><div class="sbd"></div><div class="sbd"></div>
+      <span class="surl" id="surl"></span>
+    </div>
+    <div class="sbody" id="sbody"></div>
+    <div class="note" id="snote"></div>
+  </div>
+  <div class="nav">
+    <button class="nb" id="prev" onclick="go(-1)">Previous</button>
+    <span class="sc" id="sc"></span>
+    <button class="nb p" id="next" onclick="go(1)">Next</button>
+  </div>
+</div>
+<script>
+function mkCal(evts, addBtn) {
+  const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const rows = [[9,10,11,12,13,14,15],[16,17,18,19,20,21,22]];
+  const cells = rows.map(row => row.map(n => {
+    const e = evts.find(x => x.d===n);
+    return `<div class="cd${e?' cdev':''}">${n}${e?`<div class="cev">${e.l}</div>`:''}</div>`;
+  }).join('')).join('');
+  const hdr = `<div class="calh"><span>March 2026</span>${addBtn?`<span style="font-size:11px;color:var(--color-text-info)">+ Add event</span>`:''}</div>`;
+  return `<div class="cal">${hdr}<div class="calg">${days.map(d=>`<div class="cd">${d}</div>`).join('')}${cells}</div></div>`;
+}
+const base = [{d:11,l:'Practice'},{d:20,l:'Match vs City'}];
+const plus = [{d:11,l:'Practice'},{d:14,l:'Team dinner'},{d:20,l:'Match vs City'}];
+
+const flows = [
+  { label:'Create calendar', steps:[
+    { title:'Landing page', url:'yourcal.vercel.app',
+      note:'One job: get the user to click "Create a calendar". No signup required — zero friction from the start.',
+      html:`<div class="stitle" style="font-size:19px;margin-bottom:8px">Shared calendars,<br>zero friction.</div><div class="ssub">Create a group calendar. Share a code. Anyone can join instantly.</div><div class="btn">Create a calendar</div><br><span style="font-size:12px;color:var(--color-text-tertiary)">Already have a code? </span><span style="font-size:12px;color:var(--color-text-info);cursor:pointer">Join a calendar →</span>`},
+    { title:'Name it', url:'yourcal.vercel.app/create',
+      note:'No account, no email. One text field and one button. This is the entire create flow.',
+      html:`<div class="stitle">Name your calendar</div><div class="ssub">Give it a name so people know what they're joining.</div><div class="inp">e.g. "Football team schedule"</div><div class="inp">Description (optional)</div><div class="btn">Create calendar →</div><div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px">No account needed · Free forever</div>`},
+    { title:'Codes generated', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Two codes generated server-side — short, memorable (6 chars). Same link, different codes = different access levels. Creator shares them however they want: WhatsApp, email, Discord.',
+      html:`<div class="stitle">Your calendar is ready</div><div class="ssub">Share the link + the right code with the right people.</div><div class="cbox cw"><div class="clbl">Write code — can add events</div><div class="cval">WR-4829</div></div><div class="cbox cr2"><div class="clbl">Read code — view only</div><div class="cval">RD-7731</div></div><div class="divx"></div><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Shareable link:</div><div class="inp" style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)">yourcal.vercel.app/cal/MX7K2</div><div class="btn">Copy link</div><div class="btn2">Go to my calendar</div>`},
+    { title:'Calendar (owner)', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Owner gets write access automatically — their token is saved to localStorage on creation. "Manage codes" lets them view or regenerate codes at any time.',
+      html:`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">Football team schedule</div><div style="margin-top:4px"><span class="bo">Owner</span></div></div><div class="btn2" style="font-size:11px;padding:5px 10px;">Manage codes</div></div>${mkCal(base,true)}<div class="btn">+ Add event</div>`}
+  ]},
+  { label:'Join (write)', steps:[
+    { title:'Open the link', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Visitor opens the link. App checks localStorage first — no token found, so the code entry screen is shown. "Remember this device" checkbox is on by default.',
+      html:`<div class="stitle">Enter your code</div><div class="ssub">You need a code to access this calendar. Ask the owner for the write or read code.</div><div class="inp">Enter code (e.g. WR-4829)</div><div class="chk"><div class="chkbox" style="background:var(--color-text-primary);border-color:var(--color-text-primary);"></div><div style="font-size:12px;color:var(--color-text-secondary)">Remember this device — skip code next time</div></div><div class="btn">Join calendar</div>`},
+    { title:'Access granted', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Write code validated against Supabase. Access level and a session token are saved to localStorage. User is now in write mode.',
+      html:`<div class="succ"><div class="sdot"></div><div class="stext">Write access granted</div></div><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px;">Saved to this device (localStorage):</div><div class="lsr"><div class="lsicon">key</div><span class="lskey">cal_MX7K2_access</span><span class="lsval">"write"</span></div><div class="lsr"><div class="lsicon">tok</div><span class="lskey">cal_MX7K2_token</span><span class="lsval">"tkn_a8f2…"</span></div><div style="font-size:11px;color:var(--color-text-tertiary);margin-top:10px;">Next time this link opens on this device, code entry is skipped entirely.</div>`},
+    { title:'Calendar (write view)', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'"Add event" button is visible. User cannot see or manage the codes — that is owner-only. Access badge shown for clarity.',
+      html:`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">Football team schedule</div><div style="margin-top:4px"><span class="bw">Write access</span></div></div></div>${mkCal(base,true)}<div class="btn">+ Add event</div>`}
+  ]},
+  { label:'Join (read)', steps:[
+    { title:'Open the link', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Same code entry screen. This user was given the read code instead of the write code.',
+      html:`<div class="stitle">Enter your code</div><div class="ssub">You need a code to access this calendar. Ask the owner for the write or read code.</div><div class="inp">Enter code (e.g. RD-7731)</div><div class="chk"><div class="chkbox" style="background:var(--color-text-primary);border-color:var(--color-text-primary);"></div><div style="font-size:12px;color:var(--color-text-secondary)">Remember this device — skip code next time</div></div><div class="btn">Join calendar</div>`},
+    { title:'Calendar (read view)', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'"Add event" button is hidden. Supabase Row Level Security also blocks any direct write attempt at the database level — so even if someone bypasses the UI, they cannot insert events.',
+      html:`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">Football team schedule</div><div style="margin-top:4px"><span class="br">View only</span></div></div></div>${mkCal(base,false)}<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px">No "Add event" button. Read enforced in UI and at the Supabase RLS policy level.</div>`}
+  ]},
+  { label:'Add event', steps:[
+    { title:'Event form opens', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Clicking "+ Add event" opens a slide-up modal. Only rendered for write/owner access. The modal is in normal document flow — not position:fixed.',
+      html:`<div style="min-height:300px;background:rgba(0,0,0,0.3);display:flex;align-items:flex-end;border-radius:8px;overflow:hidden;"><div style="background:var(--color-background-primary);width:100%;padding:1.1rem;border-radius:8px 8px 0 0;border-top:0.5px solid var(--color-border-tertiary);"><div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px;">Add event</div><div class="inp">Event title (required)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><div class="inp" style="margin-bottom:0">Date</div><div class="inp" style="margin-bottom:0">Start time</div></div><div class="inp">End time (optional)</div><div class="inp">Note (optional)</div><div class="btn">Save event</div><div class="btn2">Cancel</div></div></div>`},
+    { title:'Event saved', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Event inserted into Supabase. Real-time subscription broadcasts it to all active clients immediately — no page refresh needed for anyone viewing the calendar.',
+      html:`<div class="succ"><div class="sdot"></div><div class="stext">"Team dinner" added to March 14</div></div>${mkCal(plus,true)}<div style="font-size:11px;color:var(--color-text-tertiary)">Supabase realtime pushes this update live to all connected viewers.</div>`}
+  ]},
+  { label:'Return visit', steps:[
+    { title:'Opens link again', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Same device, same browser. Before rendering anything, app checks localStorage for a saved token. This happens in a useEffect on mount.',
+      html:`<div class="stitle">Checking access…</div><div class="cmon">const token = localStorage<br>&nbsp;&nbsp;.getItem('cal_MX7K2_token');<br><br>if (token) {<br>&nbsp;&nbsp;<span style="color:var(--color-text-success)">// token found — skip code screen</span><br>&nbsp;&nbsp;loadCalendar(token);<br>} else {<br>&nbsp;&nbsp;showCodeEntry();<br>}</div><div style="font-size:12px;color:var(--color-text-secondary)">Token found → code entry screen is never mounted.</div>`},
+    { title:'Straight to calendar', url:'yourcal.vercel.app/cal/MX7K2',
+      note:'Access level (read or write) is restored from the localStorage token. User lands directly on the calendar. Works across browser restarts — persists until localStorage is cleared.',
+      html:`<div class="succ"><div class="sdot"></div><div class="stext">Device recognised — no code needed</div></div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div><div style="font-size:14px;font-weight:500;color:var(--color-text-primary)">Football team schedule</div><div style="margin-top:4px"><span class="bw">Write access</span></div></div></div>${mkCal(base,true)}<div class="btn">+ Add event</div>`}
+  ]}
+];
+
+let fi = 0, si = 0;
+
+function render() {
+  const f = flows[fi]; const s = f.steps[si];
+  document.getElementById('tabs').innerHTML = flows.map((x,i) =>
+    `<button class="tab${i===fi?' on':''}" onclick="setF(${i})">${x.label}</button>`).join('');
+  document.getElementById('stepper').innerHTML = f.steps.map((x,i) =>
+    `<div class="si" onclick="setS(${i})">
+      <div class="sr"><div class="sd${i===si?' on':''}">${i+1}</div>${i<f.steps.length-1?'<div class="sl"></div>':''}</div>
+      <div class="slabel${i===si?' on':''}">${x.title}</div>
+    </div>`).join('');
+  document.getElementById('surl').textContent = s.url;
+  document.getElementById('sbody').innerHTML = s.html;
+  document.getElementById('snote').textContent = s.note;
+  document.getElementById('sc').textContent = `${si+1} of ${f.steps.length}`;
+  document.getElementById('prev').disabled = si===0;
+  document.getElementById('next').disabled = si===f.steps.length-1;
+}
+function setF(i){fi=i;si=0;render();}
+function setS(i){si=i;render();}
+function go(d){si=Math.max(0,Math.min(flows[fi].steps.length-1,si+d));render();}
+render();
+</script>

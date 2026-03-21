@@ -1,0 +1,47 @@
+.mc-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+  z-index: 40;
+}
+
+.mc-panel {
+  width: min(480px, 100%);
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border);
+  padding: 16px 16px 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.mc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mc-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.mc-x {
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+.mc-x:hover {
+  color: var(--text);
+}

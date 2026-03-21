@@ -1,0 +1,54 @@
+.welcome-codes {
+  max-width: 520px;
+}
+
+.code-box {
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.code-box.write {
+  background: var(--write-bg);
+  border: 0.5px solid var(--write-border);
+}
+
+.code-box.read {
+  background: var(--read-bg);
+  border: 0.5px solid var(--read-border);
+}
+
+.code-box-lbl {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.code-box.write .code-box-lbl {
+  color: #185fa5;
+}
+
+.code-box.read .code-box-lbl {
+  color: #3b6d11;
+}
+
+.code-box-val {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.code-box.write .code-box-val {
+  color: var(--write-text);
+}
+
+.code-box.read .code-box-val {
+  color: var(--read-text);
+}
+
+.divx {
+  height: 0.5px;
+  background: var(--border);
+  margin: 4px 0 12px;
+}

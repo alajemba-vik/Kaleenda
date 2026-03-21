@@ -1,0 +1,111 @@
+.month-cal {
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 14px;
+  background: var(--surface);
+}
+
+.month-cal-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border-bottom: 0.5px solid var(--border);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.month-title {
+  text-align: center;
+}
+
+.month-nav {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.month-nav:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.month-add-hint {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--accent-muted);
+  justify-self: end;
+}
+
+.month-add-btn {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.month-add-btn:hover {
+  background: rgba(24, 24, 27, 0.06);
+}
+
+.month-add-hint.muted {
+  min-width: 72px;
+}
+
+.month-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5px;
+  background: var(--border);
+}
+
+.month-cal-dow {
+  background: var(--surface);
+  padding: 6px 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.month-cal-cell {
+  background: var(--surface);
+  padding: 4px 5px;
+  min-height: 64px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.month-cal-cell.in {
+  color: var(--text);
+}
+
+.month-cal-cell.out {
+  opacity: 0.45;
+}
+
+.month-cal-daynum {
+  font-size: 0.68rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.month-cal-ev {
+  font-size: 0.62rem;
+  background: var(--write-bg);
+  color: var(--write-text);
+  border-radius: 3px;
+  padding: 2px 4px;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
