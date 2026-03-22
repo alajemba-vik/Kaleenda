@@ -1,16 +1,50 @@
-import { Suspense, lazy } from 'react'
+import { Component, Suspense, lazy } from 'react'
+import type { ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { LocalStorageNotice } from './components/LocalStorageNotice'
 import { SiteFooter } from './components/SiteFooter'
 import { SplashScreen } from './components/SplashScreen'
+import { HomePage } from './pages/HomePage'
+
+type AppErrorBoundaryState = {
+  hasError: boolean
+}
+
+class AppErrorBoundary extends Component<{ children: ReactNode }, AppErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(): AppErrorBoundaryState {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error('App route render error', error)
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children
+
+    return (
+      <div className="layout" style={{ paddingTop: 48 }}>
+        <div className="surface-card" style={{ maxWidth: 560 }}>
+          <p className="kicker">Reload Needed</p>
+          <h1 className="page-title">We hit a loading issue</h1>
+          <p className="page-sub">Please refresh to load the latest app files.</p>
+          <button type="button" className="btn" onClick={() => window.location.reload()}>
+            Refresh
+          </button>
+        </div>
+      </div>
+    )
+  }
+}
 
 const CreatePage = lazy(async () => {
   const mod = await import('./pages/CreatePage')
   return { default: mod.CreatePage }
-})
-const HomePage = lazy(async () => {
-  const mod = await import('./pages/HomePage')
-  return { default: mod.HomePage }
 })
 const JoinPage = lazy(async () => {
   const mod = await import('./pages/JoinPage')
@@ -37,18 +71,20 @@ export default function App() {
   return (
     <div className="app-shell">
       <SplashScreen />
-      <Suspense fallback={<div className="layout">Loading...</div>}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/create" element={<CreatePage />} />
-          <Route path="/join" element={<JoinPage />} />
-          <Route path="/cal/:calendarId" element={<CalendarPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/legal" element={<LegalPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+      <AppErrorBoundary>
+        <Suspense fallback={<div className="layout">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/create" element={<CreatePage />} />
+            <Route path="/join" element={<JoinPage />} />
+            <Route path="/cal/:calendarId" element={<CalendarPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/legal" element={<LegalPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </AppErrorBoundary>
       <SiteFooter />
       <LocalStorageNotice />
     </div>
