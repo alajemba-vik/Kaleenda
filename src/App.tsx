@@ -1,6 +1,6 @@
 import { Component, Suspense, lazy } from 'react'
 import type { ReactNode } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { LocalStorageNotice } from './components/LocalStorageNotice'
 import { SiteFooter } from './components/SiteFooter'
 import { SplashScreen } from './components/SplashScreen'
@@ -68,6 +68,9 @@ const LegalPage = lazy(async () => {
 })
 
 export default function App() {
+  const location = useLocation()
+  const showGlobalFooter = location.pathname !== '/'
+
   return (
     <div className="app-shell">
       <SplashScreen />
@@ -85,7 +88,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </AppErrorBoundary>
-      <SiteFooter />
+      {showGlobalFooter ? <SiteFooter /> : null}
       <LocalStorageNotice />
     </div>
   )
