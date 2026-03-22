@@ -45,18 +45,25 @@ export function CreatePage() {
       const anon = createAnonClient()
       const { data, error } = await anon.rpc('create_calendar', { p_name: name })
       if (error) throw error
+      const createdAt = (data as { created_at?: string } | null | undefined)?.created_at
+      if (!createdAt) {
+        throw new Error('create_calendar response missing created_at — check Supabase insert return shape')
+      }
       const j = data as {
         public_id: string
         write_code: string
         read_code: string
         owner_code: string
         owner_session_token: string
+        created_at: string
       }
       writeStoredSession(j.public_id, j.owner_session_token, 'owner' as AccessLevel)
       nav(`/cal/${encodeURIComponent(j.public_id)}`, {
         replace: false,
         state: {
           fromCreate: true,
+          createdAt,
+          calendarName: name,
           writeCode: j.write_code,
           readCode: j.read_code,
           ownerCode: j.owner_code,
@@ -64,7 +71,12 @@ export function CreatePage() {
         },
       })
     } catch (er: unknown) {
-      setErr(formatSupabaseError(er))
+      if (er instanceof Error && er.message.includes('create_calendar response missing created_at')) {
+        console.error(er)
+        setErr('Something went wrong creating your calendar. Please try again.')
+      } else {
+        setErr(formatSupabaseError(er))
+      }
     } finally {
       setBusy(false)
     }

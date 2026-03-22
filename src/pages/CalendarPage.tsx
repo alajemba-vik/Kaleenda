@@ -22,6 +22,8 @@ import '../styles/ui.css'
 
 type CreateNavState = {
   fromCreate?: boolean
+  createdAt?: string
+  calendarName?: string
   writeCode?: string
   readCode?: string
   ownerCode?: string
@@ -330,7 +332,9 @@ export function CalendarPage() {
         ) : null}
         {phase === 'welcome' && createState?.writeCode && createState.readCode ? (
           <WelcomeCodes
-            calendarName={metaName ?? 'Calendar'}
+            calendarId={calendarId}
+            calendarName={metaName ?? createState.calendarName ?? 'Calendar'}
+            createdAt={createState.createdAt}
             writeCode={createState.writeCode}
             readCode={createState.readCode}
             ownerCode={createState.ownerCode ?? ''}

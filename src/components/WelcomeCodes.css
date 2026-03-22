@@ -169,6 +169,159 @@
   width: 100%;
 }
 
+.welcome-save-btn {
+  width: 100%;
+  margin: 0 0 10px;
+}
+
+.welcome-email-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.welcome-email-input {
+  margin: 0;
+  height: 40px;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+}
+
+.welcome-email-btn {
+  min-height: 40px;
+  height: 40px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.welcome-inline-feedback {
+  margin: 0 0 10px;
+}
+
+.welcome-email-success {
+  margin: 0 0 10px;
+  color: var(--success);
+  font-size: 13px;
+}
+
+.keycard-capture-host {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1200px;
+  height: 680px;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.keycard {
+  width: 1200px;
+  height: 680px;
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.08);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #1a1916;
+}
+
+.keycard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.keycard-wordmark {
+  font-family: var(--logo-font);
+  font-size: 54px;
+  letter-spacing: -0.02em;
+}
+
+.keycard-chip {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 16px;
+  color: #6b6860;
+}
+
+.keycard-center {
+  display: grid;
+  gap: 24px;
+}
+
+.keycard-calendar {
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.keycard-codes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.keycard-code-block {
+  background: #f8f7f3;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+.keycard-code-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: #6b6860;
+  margin-bottom: 10px;
+}
+
+.keycard-code-value {
+  font-size: 30px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.keycard-url {
+  font-size: 18px;
+  color: #3f3b34;
+  background: #f6f5f1;
+  border: 1px dashed rgba(0, 0, 0, 0.14);
+  border-radius: 12px;
+  padding: 14px 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.keycard-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.keycard-note {
+  font-size: 15px;
+  color: var(--text-tertiary);
+}
+
+.keycard-date {
+  font-size: 16px;
+  color: #6b6860;
+}
+
 @media (max-width: 560px) {
   .welcome-codes {
     padding: var(--space-3);
@@ -181,5 +334,13 @@
   .code-box-val {
     font-size: 18px;
     letter-spacing: 0.08em;
+  }
+
+  .welcome-email-row {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-email-btn {
+    width: 100%;
   }
 }

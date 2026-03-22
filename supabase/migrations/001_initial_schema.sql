@@ -155,6 +155,7 @@ declare
   v_read text;
   v_owner text;
   v_cal_id uuid;
+  v_created_at timestamptz;
   v_owner_token uuid;
 begin
   if p_name is null or length(trim(p_name)) = 0 then
@@ -186,7 +187,7 @@ begin
     public.hash_access_code(v_owner),
     v_owner
   )
-  returning id into v_cal_id;
+  returning id, created_at into v_cal_id, v_created_at;
 
   insert into public.calendar_sessions (calendar_id, access_level, token)
   values (v_cal_id, 'owner', gen_random_uuid())
@@ -198,7 +199,8 @@ begin
     'write_code', v_write,
     'read_code', v_read,
     'owner_code', v_owner,
-    'owner_session_token', v_owner_token::text
+    'owner_session_token', v_owner_token::text,
+    'created_at', v_created_at
   );
 end;
 $$;
