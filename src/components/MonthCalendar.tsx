@@ -1,4 +1,5 @@
 import type { CalendarEvent } from '../lib/types'
+import { PlushieCharacter } from './PlushieCharacter'
 import {
   formatMonthTitle,
   monthGrid,
@@ -40,6 +41,7 @@ type Props = {
   onNextMonth: () => void
   showAddHint?: boolean
   onEventClick?: (ev: CalendarEvent) => void
+  className?: string
 }
 
 export function MonthCalendar({
@@ -49,6 +51,7 @@ export function MonthCalendar({
   onNextMonth,
   showAddHint,
   onEventClick,
+  className,
 }: Props) {
   const weeks = monthGrid(anchor)
   const byDay = new Map<string, CalendarEvent[]>()
@@ -61,7 +64,7 @@ export function MonthCalendar({
   }
 
   return (
-    <div className="month-cal">
+    <div className={`month-cal ${className ?? ''}`.trim()}>
       <div className="month-cal-head">
         <button type="button" className="month-nav" onClick={onPrevMonth} aria-label="Previous month">
           ‹
@@ -100,6 +103,9 @@ export function MonthCalendar({
                     onClick={() => onEventClick?.(ev)}
                   >
                     {formatTime(ev.start_time)} {ev.title}
+                    <span className="month-ev-plushie" aria-hidden="true">
+                      <PlushieCharacter mood={ev.mood ?? 'chill'} size={24} />
+                    </span>
                   </button>
                 ))}
               </div>

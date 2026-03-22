@@ -533,3 +533,148 @@
   }
 }
 
+.calendar-theme-root {
+  background: var(--cal-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+}
+
+.calendar-theme-root[data-theme='default'] {
+  --cal-bg: #f7f6f2;
+  --cal-surface: #ffffff;
+  --cal-grid: rgba(0, 0, 0, 0.06);
+  --cal-today: #3d6fff;
+  --cal-event: #eef2ff;
+  --cal-event-text: #3d6fff;
+}
+
+.calendar-theme-root[data-theme='dark'] {
+  --cal-bg: #1a1916;
+  --cal-surface: #2c2c2a;
+  --cal-grid: rgba(255, 255, 255, 0.06);
+  --cal-today: #378add;
+  --cal-event: #0c447c;
+  --cal-event-text: #b5d4f4;
+}
+
+.calendar-theme-root[data-theme='pastel'] {
+  --cal-bg: #fdf6f9;
+  --cal-surface: #ffffff;
+  --cal-grid: rgba(212, 83, 126, 0.08);
+  --cal-today: #d4537e;
+  --cal-event: #fbeaf0;
+  --cal-event-text: #993556;
+}
+
+.calendar-theme-root[data-theme='forest'] {
+  --cal-bg: #f2f5f0;
+  --cal-surface: #ffffff;
+  --cal-grid: rgba(29, 158, 117, 0.08);
+  --cal-today: #1d9e75;
+  --cal-event: #e1f5ee;
+  --cal-event-text: #0f6e56;
+}
+
+.calendar-theme-root[data-theme='midnight'] {
+  --cal-bg: #0d1b2a;
+  --cal-surface: #1a2e42;
+  --cal-grid: rgba(55, 138, 221, 0.1);
+  --cal-today: #378add;
+  --cal-event: #0c447c;
+  --cal-event-text: #85b7eb;
+}
+
+.calendar-theme-root[data-theme='sunset'] {
+  --cal-bg: #fdf3ee;
+  --cal-surface: #ffffff;
+  --cal-grid: rgba(216, 90, 48, 0.08);
+  --cal-today: #d85a30;
+  --cal-event: #faece7;
+  --cal-event-text: #993c1d;
+}
+
+.calendar-theme-root[data-theme='dark'] .cal-top-name,
+.calendar-theme-root[data-theme='midnight'] .cal-top-name,
+.calendar-theme-root[data-theme='dark'] .cal-home-link,
+.calendar-theme-root[data-theme='midnight'] .cal-home-link {
+  color: #f1efe8;
+}
+
+.theme-popover-wrap {
+  position: relative;
+}
+
+.theme-trigger {
+  min-height: 34px;
+  height: 34px;
+  padding: 0 10px;
+}
+
+.theme-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  box-shadow: var(--shadow-md);
+}
+
+.theme-swatch {
+  --swatch: #d9d6cf;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background: var(--swatch, #d9d6cf);
+  cursor: pointer;
+}
+
+.theme-swatch.active {
+  border-color: #1a1916;
+}
+
+.share-card-host {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1280px;
+  pointer-events: none;
+}
+
+.share-month-card {
+  width: 1280px;
+  padding: 28px;
+  background: var(--cal-bg);
+  color: var(--text-primary);
+}
+
+.share-month-title {
+  font-size: 34px;
+  font-weight: 500;
+  margin: 0 0 14px;
+}
+
+.share-month-cal .month-nav {
+  display: none;
+}
+
+.share-month-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.capture-freeze .plushie-character {
+  animation-play-state: paused !important;
+  animation-delay: -0.2s !important;
+}

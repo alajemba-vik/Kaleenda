@@ -32,6 +32,7 @@ create table public.calendars (
   id uuid primary key default gen_random_uuid(),
   public_id text not null unique,
   name text not null,
+  theme text not null default 'default' check (theme in ('default','dark','pastel','forest','midnight','sunset')),
   write_code_hash text not null,
   read_code_hash text not null,
   write_code_plain text not null,
@@ -59,6 +60,7 @@ create table public.events (
   id uuid primary key default gen_random_uuid(),
   calendar_id uuid not null references public.calendars(id) on delete cascade,
   title text not null,
+  mood text not null default 'chill' check (mood in ('chill','panic','celebration','onfire','deadline','easy','urgent','vibes','love','hyperspeed','melting','glitch','hype','ghost','zen','chaos')),
   event_date date not null,
   start_time time not null,
   end_time time,
@@ -102,6 +104,25 @@ create policy "calendars_delete_owner"
       where s.calendar_id = calendars.id
         and s.token = public.jwt_session_token()
         and s.access_level = 'owner'
+    )
+  );
+
+create policy "calendars_update_theme_write"
+  on public.calendars for update
+  using (
+    exists (
+      select 1 from public.calendar_sessions s
+      where s.calendar_id = calendars.id
+        and s.token = public.jwt_session_token()
+        and s.access_level in ('owner', 'write')
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.calendar_sessions s
+      where s.calendar_id = calendars.id
+        and s.token = public.jwt_session_token()
+        and s.access_level in ('owner', 'write')
     )
   );
 
@@ -375,3 +396,9 @@ exception
   when duplicate_object then null;
 end $$;
 
+do $$
+begin
+  alter publication supabase_realtime add table public.calendars;
+exception
+  when duplicate_object then null;
+end $$;

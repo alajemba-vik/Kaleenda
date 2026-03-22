@@ -4,6 +4,7 @@
   --surface-2: #f0eee9;
   --border: rgba(0, 0, 0, 0.07);
   --border-strong: rgba(0, 0, 0, 0.13);
+  --border-tertiary: rgba(0, 0, 0, 0.09);
   --text-primary: #1a1916;
   --text-secondary: #6b6860;
   --text-tertiary: #a8a49e;
@@ -30,6 +31,12 @@
   --font: 'DM Sans', sans-serif;
   --logo-font: 'Instrument Serif', serif;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --cal-bg: #f7f6f2;
+  --cal-surface: #ffffff;
+  --cal-grid: rgba(0, 0, 0, 0.06);
+  --cal-today: #3d6fff;
+  --cal-event: #eef2ff;
+  --cal-event-text: #3d6fff;
   --dur-micro: 120ms;
   --dur-base: 150ms;
   --dur-modal: 280ms;
@@ -112,3 +119,19 @@ h6 {
   }
 }
 
+@keyframes kl-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes kl-shake { 0%,100%{transform:translateX(0) rotate(0deg)} 20%{transform:translateX(-5px) rotate(-6deg)} 40%{transform:translateX(5px) rotate(6deg)} 60%{transform:translateX(-3px) rotate(-3deg)} 80%{transform:translateX(3px) rotate(3deg)} }
+@keyframes kl-bounce { 0%,100%{transform:translateY(0) scaleY(1)} 40%{transform:translateY(-10px) scaleY(1.05)} 60%{transform:translateY(-7px)} }
+@keyframes kl-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.14)} }
+@keyframes kl-wobble { 0%,100%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)} }
+@keyframes kl-nod { 0%,100%{transform:rotate(0deg)} 30%{transform:rotate(-12deg)} 60%{transform:rotate(6deg)} }
+@keyframes kl-squish { 0%,100%{transform:scaleX(1) scaleY(1)} 50%{transform:scaleX(1.12) scaleY(0.9)} }
+@keyframes kl-wave { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(16deg) translateY(-2px)} 75%{transform:rotate(-6deg)} }
+@keyframes kl-spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+@keyframes kl-heartbeat { 0%,100%{transform:scale(1)} 14%{transform:scale(1.15)} 28%{transform:scale(1)} 42%{transform:scale(1.1)} 70%{transform:scale(1)} }
+@keyframes kl-dash { 0%{transform:translateX(0)} 100%{transform:translateX(8px)} }
+@keyframes kl-drip { 0%,100%{transform:translateY(0) scaleY(1)} 50%{transform:translateY(4px) scaleY(1.08)} }
+@keyframes kl-glitch { 0%,100%{transform:translate(0)} 20%{transform:translate(-2px,1px)} 40%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,2px)} 80%{transform:translate(1px,-2px)} }
+@keyframes kl-trumpet { 0%,100%{transform:rotate(0deg) scale(1)} 25%{transform:rotate(-8deg) scale(1.05)} 75%{transform:rotate(8deg) scale(1.05)} }
+@keyframes kl-melt { 0%,100%{transform:scaleY(1) translateY(0)} 50%{transform:scaleY(1.06) translateY(2px)} }
+@keyframes kl-zen { 0%,100%{transform:rotate(-3deg) translateY(0)} 50%{transform:rotate(3deg) translateY(-3px)} }

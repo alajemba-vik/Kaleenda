@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { FREE_MOODS, PREMIUM_MOODS, PlushieCharacter } from './PlushieCharacter'
+import type { Mood } from '../lib/types'
 import '../styles/ui.css'
 import './AddEventPanel.css'
 
@@ -9,6 +11,7 @@ type Props = {
   onCreatorNameChange?: (name: string) => void
   onSave: (payload: {
     title: string
+    mood: Mood
     event_date: string
     start_time: string
     end_time: string | null
@@ -22,6 +25,7 @@ export function AddEventPanel({ open, onClose, initialCreatorName, onCreatorName
   const [err, setErr] = useState<string | null>(null)
   const [rendered, setRendered] = useState(open)
   const [closing, setClosing] = useState(false)
+  const [mood, setMood] = useState<Mood>('chill')
 
   useEffect(() => {
     if (open) {
@@ -94,6 +98,7 @@ export function AddEventPanel({ open, onClose, initialCreatorName, onCreatorName
             try {
               await onSave({
                 title,
+                mood,
                 event_date,
                 start_time: start_time.length === 5 ? `${start_time}:00` : start_time,
                 end_time: end_raw ? (end_raw.length === 5 ? `${end_raw}:00` : end_raw) : null,
@@ -101,6 +106,7 @@ export function AddEventPanel({ open, onClose, initialCreatorName, onCreatorName
                 creator_name: creator_raw,
               })
               formEl.reset()
+              setMood('chill')
               onClose()
             } catch (er) {
               setErr(er instanceof Error ? er.message : 'Could not save')
@@ -120,6 +126,46 @@ export function AddEventPanel({ open, onClose, initialCreatorName, onCreatorName
             required
             disabled={busy}
           />
+          <div className="add-vibe-wrap">
+            <div className="add-label">Vibe</div>
+            <div className="add-mood-scroll" role="listbox" aria-label="Select event vibe">
+              <div className="add-mood-row">
+                {FREE_MOODS.map((m) => {
+                  const selected = mood === m.key
+                  return (
+                    <button
+                      key={m.key}
+                      type="button"
+                      className={`add-mood-card ${selected ? 'selected' : ''}`}
+                      onClick={() => setMood(m.key)}
+                      aria-selected={selected}
+                    >
+                      <div className="add-mood-icon"><PlushieCharacter mood={m.key} size={selected ? 44 : 40} /></div>
+                      <div className="add-mood-name">{m.label}</div>
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="add-mood-row">
+                {PREMIUM_MOODS.map((m) => {
+                  const selected = mood === m.key
+                  return (
+                    <button
+                      key={m.key}
+                      type="button"
+                      className={`add-mood-card ${selected ? 'selected' : ''}`}
+                      onClick={() => setMood(m.key)}
+                      aria-selected={selected}
+                    >
+                      <span className="add-premium-badge">✦ Premium</span>
+                      <div className="add-mood-icon"><PlushieCharacter mood={m.key} size={selected ? 44 : 40} /></div>
+                      <div className="add-mood-name">{m.label}</div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
           <label className="add-label" htmlFor="ev-creator">
             Your name
           </label>

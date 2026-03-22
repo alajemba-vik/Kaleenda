@@ -96,3 +96,77 @@ textarea.field {
 .add-panel-actions .btn-secondary {
   width: 100%;
 }
+
+.add-vibe-wrap {
+  margin-bottom: var(--space-1);
+}
+
+.add-mood-scroll {
+  display: grid;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.add-mood-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 72px;
+  gap: 8px;
+}
+
+.add-mood-card {
+  width: 72px;
+  height: 88px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 150ms var(--ease-standard);
+}
+
+.add-mood-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.add-mood-card.selected {
+  background: var(--accent-light);
+  border: 2px solid var(--accent);
+}
+
+.add-mood-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  transition: transform 150ms var(--ease-standard);
+}
+
+.add-mood-card.selected .add-mood-icon {
+  transform: scale(1.04);
+}
+
+.add-mood-name {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.add-premium-badge {
+  position: absolute;
+  top: 5px;
+  right: 4px;
+  background: #ef9f27;
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 5px;
+  font-size: 9px;
+  line-height: 1;
+}
