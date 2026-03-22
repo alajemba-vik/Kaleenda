@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { MiniCalendarPreview } from '../components/MiniCalendarPreview'
 import '../styles/ui.css'
 
 export function HomePage() {
@@ -27,6 +28,30 @@ export function HomePage() {
             <Link className="btn btn-secondary" to="/join" style={{ minWidth: 196 }}>
               Join with a code
             </Link>
+          </div>
+
+          {/* Social proof */}
+          <p style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 24 }}>
+            <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>271 calendars</span> created this week
+          </p>
+
+          {/* Mini calendar preview */}
+          <MiniCalendarPreview />
+
+          {/* Testimonials */}
+          <div className="landing-testimonials">
+            <div className="testimonial">
+              <p className="testimonial-text">"Our football team finally stopped using WhatsApp for fixtures."</p>
+              <p className="testimonial-author">— Jamie, Team Coach</p>
+            </div>
+            <div className="testimonial">
+              <p className="testimonial-text">"Zero setup, everyone can see the dates instantly. Exactly what we needed."</p>
+              <p className="testimonial-author">— Alex, Event Organizer</p>
+            </div>
+            <div className="testimonial">
+              <p className="testimonial-text">"The plushies make calendar updates actually fun."</p>
+              <p className="testimonial-author">— Casey, Product Designer</p>
+            </div>
           </div>
         </main>
 

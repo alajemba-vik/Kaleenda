@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
+import { celebrateCalendarCreation } from '../lib/confetti'
 import { createAnonClient } from '../lib/supabase'
 import '../styles/ui.css'
 import './WelcomeCodes.css'
@@ -57,6 +58,11 @@ export function WelcomeCodes({
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null)
   const keyCardRef = useRef<HTMLDivElement | null>(null)
   const anon = useMemo(() => createAnonClient(), [])
+
+  // Fire confetti on mount (calendar creation)
+  useEffect(() => {
+    celebrateCalendarCreation()
+  }, [])
 
   const safeCalendarName = calendarName?.trim() || 'Your calendar'
   const safeShareUrl = shareUrl.trim() || window.location.href
@@ -129,7 +135,11 @@ export function WelcomeCodes({
       setEmail('')
     } catch (e) {
       const msg = e instanceof Error && e.message ? e.message : 'Could not send email right now.'
-      setEmailError(msg)
+      if (msg.includes('Failed to send a request to the Edge Function')) {
+        setEmailError('Email service is unavailable right now. Please try again in a minute.')
+      } else {
+        setEmailError(msg)
+      }
     } finally {
       setEmailBusy(false)
     }
@@ -177,8 +187,8 @@ export function WelcomeCodes({
       </div>
 
       <div className="owner-code-wrap">
-        <div className="code-box-lbl owner-title">Owner code - lets you manage this calendar from any device.</div>
         <div className="code-box owner">
+          <div className="code-box-lbl owner-pill-label">OWNER CODE</div>
           <div className="code-box-line">
             <div className={`code-box-val owner-code mono ${safeOwnerCode ? '' : 'owner-code-missing'}`}>
               {safeOwnerCode || 'Unavailable - apply owner code migration'}
@@ -215,7 +225,7 @@ export function WelcomeCodes({
         </button>
       </div>
 
-      <button type="button" className="btn btn-secondary welcome-save-btn" onClick={() => void onSaveCard()} disabled={saveBusy}>
+      <button type="button" className="btn welcome-save-btn" onClick={() => void onSaveCard()} disabled={saveBusy}>
         {saveBusy ? 'Generating key card...' : 'Save your codes'}
       </button>
       {saveError ? <p className="error-text welcome-inline-feedback">{saveError}</p> : null}
@@ -255,7 +265,7 @@ export function WelcomeCodes({
         </p>
       ) : null}
 
-      <button type="button" className="btn welcome-cta" onClick={() => onContinue()}>
+      <button type="button" className="btn btn-secondary welcome-cta" onClick={() => onContinue()}>
         Open my calendar →
       </button>
 

@@ -3,20 +3,21 @@
   inset: 0;
   z-index: 70;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(4px);
-  padding: 0;
+  padding: 16px;
+  overflow-y: auto;
 }
 
 .event-detail-panel {
   width: min(620px, 100%);
-  max-height: 88vh;
+  max-height: min(88vh, 720px);
   overflow: auto;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   padding: var(--space-4);
   animation: event-slide-up var(--dur-modal) var(--ease-modal) both;
@@ -76,8 +77,15 @@
 }
 
 @media (max-width: 560px) {
+  .event-detail-backdrop {
+    padding: 10px;
+  }
+
+  .event-detail-panel {
+    max-height: 92vh;
+  }
+
   .event-detail-grid {
     grid-template-columns: 1fr;
   }
 }
-

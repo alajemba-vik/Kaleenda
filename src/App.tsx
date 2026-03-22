@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { LocalStorageNotice } from './components/LocalStorageNotice'
 import { SiteFooter } from './components/SiteFooter'
+import { SplashScreen } from './components/SplashScreen'
 
 const CreatePage = lazy(async () => {
   const mod = await import('./pages/CreatePage')
@@ -35,6 +36,7 @@ const LegalPage = lazy(async () => {
 export default function App() {
   return (
     <div className="app-shell">
+      <SplashScreen />
       <Suspense fallback={<div className="layout">Loading...</div>}>
         <Routes>
           <Route path="/" element={<HomePage />} />

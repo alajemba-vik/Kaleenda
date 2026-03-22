@@ -6,10 +6,12 @@ import { AddEventPanel } from '../components/AddEventPanel'
 import { CodeEntry } from '../components/CodeEntry'
 import { EventDetailModal } from '../components/EventDetailModal'
 import { ManageCodesModal } from '../components/ManageCodesModal'
+import { PwaInstallBanner } from '../components/PwaInstallBanner'
 import { filterEventsForMonth, MonthCalendar } from '../components/MonthCalendar'
 import { WelcomeCodes } from '../components/WelcomeCodes'
 import { addMonths } from '../lib/calendarGrid'
 import { randomAnonymousName } from '../lib/anonymousName'
+import { usePwaPrompt } from '../lib/usePwaPrompt'
 import { createAnonClient, createAuthClient } from '../lib/supabase'
 import { exchangeSessionJwt } from '../lib/session'
 import {
@@ -101,6 +103,9 @@ export function CalendarPage() {
   const [calendarTheme, setCalendarTheme] = useState<CalendarTheme>('default')
   const [themeBusy, setThemeBusy] = useState(false)
   const shareCardRef = useRef<HTMLDivElement | null>(null)
+  const [firstEventAdded, setFirstEventAdded] = useState(false)
+
+  const { showPrompt, deferredPrompt, triggerPrompt, handleInstall, handleDismiss } = usePwaPrompt()
 
   const createState = location.state as CreateNavState | null
   const fromCreateNav = !!(createState?.fromCreate && createState?.ownerSessionToken)
@@ -566,17 +571,25 @@ export function CalendarPage() {
           const normalizedName = payload.creator_name.trim() || creatorName.trim() || randomAnonymousName()
           writeCreatorName(calendarId, normalizedName)
           setCreatorName(normalizedName)
-          const { error } = await authClient.from('events').insert({
-            calendar_id: calendarUuid,
-            title: payload.title,
-            mood: payload.mood,
-            event_date: payload.event_date,
-            start_time: payload.start_time,
-            end_time: payload.end_time,
-            note: payload.note,
-            creator_name: normalizedName,
-          })
-          if (error) throw new Error(error.message)
+          const { data, error } = await authClient.from('events').insert({
+             calendar_id: calendarUuid,
+             title: payload.title,
+             mood: payload.mood,
+             event_date: payload.event_date,
+             start_time: payload.start_time,
+             end_time: payload.end_time,
+             note: payload.note,
+             creator_name: normalizedName,
+          }).select('*').single()
+           if (error) throw new Error(error.message)
+          if (data) {
+            setEvents((prev) => mergeById(prev, data as CalendarEvent))
+            // Trigger PWA prompt after first event is added
+            if (!firstEventAdded) {
+              setFirstEventAdded(true)
+              triggerPrompt()
+            }
+          }
         }}
       />
 
@@ -617,6 +630,8 @@ export function CalendarPage() {
           </div>
         </div>
       </div>
+
+      <PwaInstallBanner show={showPrompt && !!deferredPrompt} onInstall={handleInstall} onDismiss={handleDismiss} />
     </div>
   )
 }
