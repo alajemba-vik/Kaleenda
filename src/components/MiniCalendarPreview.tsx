@@ -18,7 +18,7 @@ const DEMO_EVENTS: DemoEvent[] = [
 ]
 
 const THEMES: CalendarTheme[] = ['default', 'forest', 'sunset', 'pastel']
-const THEME_CYCLE_INTERVAL = 4000
+const THEME_CYCLE_INTERVAL = 3500
 const THEME_TRANSITION_DURATION = 300
 
 type Props = {
@@ -39,7 +39,11 @@ export function MiniCalendarPreview({ theme: overrideTheme }: Props) {
     const timer = setInterval(() => {
       setIsTransitioning(true)
       setTimeout(() => {
-        setCurrentThemeIndex((prev) => (prev + 1) % THEMES.length)
+        setCurrentThemeIndex((prev) => {
+          const next = (prev + 1) % THEMES.length
+          console.log(`[MiniCalendarPreview] Theme cycle: ${THEMES[prev]} → ${THEMES[next]}`)
+          return next
+        })
         setIsTransitioning(false)
       }, THEME_TRANSITION_DURATION / 2)
     }, THEME_CYCLE_INTERVAL)
@@ -104,7 +108,6 @@ export function MiniCalendarPreview({ theme: overrideTheme }: Props) {
         <div className={`mini-cal-preview mini-cal-${currentTheme}`} data-theme={currentTheme}>
           <div className="mini-cal-header">
             <h3 className="mini-cal-title">{formatMonthTitle(anchor)}</h3>
-            <p className="mini-cal-subtitle">See your events at a glance</p>
           </div>
           <div className="mini-cal-grid">
             {weekdays.map((d) => (
@@ -132,7 +135,7 @@ export function MiniCalendarPreview({ theme: overrideTheme }: Props) {
                           animation: `mini-bounce 0.6s ease-in-out ${i * 0.15}s infinite`,
                         }}
                       >
-                        <PlushieCharacter mood={ev.mood} size={18} />
+                        <PlushieCharacter mood={ev.mood} size={28} />
                       </div>
                     ))}
                   </div>

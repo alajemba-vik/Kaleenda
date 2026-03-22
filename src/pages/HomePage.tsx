@@ -14,13 +14,30 @@ export function HomePage() {
         <main className="fade-stage delay-1" style={{ margin: 'auto 0', maxWidth: 720 }}>
           <h1
             className="page-title"
-            style={{ fontSize: 'clamp(2.4rem, 8vw, 56px)', letterSpacing: '-0.03em', fontWeight: 400, marginBottom: 16 }}
+            style={{ fontSize: 'clamp(32px, 4vw, 52px)', letterSpacing: '-0.03em', fontWeight: 400, marginBottom: 16, maxWidth: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           >
             Shared calendars, no accounts.
           </h1>
           <p className="page-sub" style={{ fontSize: 18, maxWidth: 620 }}>
             Create a group calendar. Share a code. Anyone joins instantly.
           </p>
+
+          {/* Use-case pills */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+            <span style={{ background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 99, padding: '6px 14px', fontSize: 13, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>💍</span> Planning a wedding
+            </span>
+            <span style={{ background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 99, padding: '6px 14px', fontSize: 13, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>📚</span> Surviving exam season
+            </span>
+            <span style={{ background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 99, padding: '6px 14px', fontSize: 13, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>⚽</span> Organising a team
+            </span>
+            <span style={{ background: 'var(--surface)', border: '0.5px solid var(--border)', borderRadius: 99, padding: '6px 14px', fontSize: 13, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>✈️</span> Going on a trip
+            </span>
+          </div>
+
           <div className="small-actions" style={{ gap: 12 }}>
             <Link className="btn" to="/create" style={{ minWidth: 196 }}>
               Create a calendar
@@ -56,11 +73,6 @@ export function HomePage() {
         </main>
 
         <footer className="fade-stage delay-2" style={{ paddingTop: 80 }}>
-          <div className="small-actions" style={{ gap: 12 }}>
-            <span className="badge badge-read">No signup</span>
-            <span className="badge badge-read">Two access levels</span>
-            <span className="badge badge-read">Lives on any device</span>
-          </div>
         </footer>
       </div>
     </div>

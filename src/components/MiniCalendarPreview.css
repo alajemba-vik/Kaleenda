@@ -51,7 +51,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 56px;
+  min-height: 64px;
   font-size: 11px;
   overflow: hidden;
   transition: background-color 0.2s;
@@ -85,8 +85,8 @@
 }
 
 .mini-cal-event svg {
-  width: 18px;
-  height: 18px;
+  width: 28px;
+  height: 28px;
 }
 
 @keyframes mini-cal-slide-in {
@@ -110,7 +110,28 @@
   }
 }
 
-/* Theme variants */
+/* Theme variants with data-theme attribute */
+.mini-cal-preview[data-theme="default"] {
+  --accent: #3d6fff;
+  --accent-light: rgba(61, 111, 255, 0.1);
+}
+
+.mini-cal-preview[data-theme="forest"] {
+  --accent: #1d9e75;
+  --accent-light: rgba(29, 158, 117, 0.1);
+}
+
+.mini-cal-preview[data-theme="sunset"] {
+  --accent: #d85a30;
+  --accent-light: rgba(216, 90, 48, 0.1);
+}
+
+.mini-cal-preview[data-theme="pastel"] {
+  --accent: #d4537e;
+  --accent-light: rgba(212, 83, 126, 0.1);
+}
+
+/* Legacy theme class variants (for backward compatibility) */
 .mini-cal-forest {
   --accent: #1d9e75;
   --accent-light: rgba(29, 158, 117, 0.1);
