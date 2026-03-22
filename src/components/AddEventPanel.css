@@ -3,9 +3,9 @@
   inset: 0;
   z-index: 60;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 16px;
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(4px);
   transition: opacity var(--dur-modal) var(--ease-modal);
@@ -17,15 +17,17 @@
   overflow: auto;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border-radius: var(--radius-xl);
   padding: var(--space-4);
   box-shadow: var(--shadow-lg);
-  transform: translateY(100%);
-  transition: transform var(--dur-modal) var(--ease-modal);
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  transition: transform var(--dur-modal) var(--ease-modal), opacity var(--dur-modal) var(--ease-modal);
 }
 
 .add-panel-backdrop.open .add-panel {
-  transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .add-panel-backdrop.closing {
@@ -51,7 +53,28 @@
 .add-panel-title {
   font-size: 22px;
   font-weight: 500;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
   margin: 0;
+  color: var(--text-primary);
+}
+
+.add-close-btn {
+  border: none;
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 24px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.add-close-btn:hover {
+  background: var(--surface-2);
   color: var(--text-primary);
 }
 
@@ -140,6 +163,17 @@ textarea.field {
   border: 2px solid var(--accent);
 }
 
+.add-mood-card.locked {
+  opacity: 0.62;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.add-mood-card.locked:hover {
+  transform: none;
+  border-color: var(--border);
+}
+
 .add-mood-icon {
   width: 44px;
   height: 44px;
@@ -159,14 +193,33 @@ textarea.field {
   text-align: center;
 }
 
-.add-premium-badge {
+
+.add-premium-lock {
   position: absolute;
   top: 5px;
-  right: 4px;
-  background: #ef9f27;
-  color: #fff;
-  border-radius: 999px;
-  padding: 2px 5px;
-  font-size: 9px;
+  right: 5px;
+  font-size: 10px;
   line-height: 1;
+  opacity: 0.7;
 }
+
+.add-help-text {
+  margin: 4px 0 var(--space-1);
+  font-size: 11px;
+  color: #797c73;
+}
+
+.add-panel-form .field.add-creator-input {
+  background: #f5f0e8;
+  border: none;
+  border-radius: 16px;
+  padding: 0 24px;
+  height: 48px;
+  font-size: 15px;
+  color: #31332c;
+}
+
+.add-panel-form .field.add-creator-input:focus {
+  box-shadow: 0 0 0 2px rgba(93, 94, 97, 0.2);
+}
+

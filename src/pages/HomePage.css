@@ -9,9 +9,9 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(245, 240, 232, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 0.5px solid var(--border);
+  background: rgba(245, 240, 232, 0.86);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 40px rgba(49, 51, 44, 0.06);
 }
 
 .lp-nav-inner {
@@ -26,7 +26,9 @@
 
 .lp-wordmark {
   font-family: 'Instrument Serif', serif;
-  font-size: 20px;
+  font-size: 28px;
+  font-style: italic;
+  line-height: 1;
   letter-spacing: -0.02em;
   text-decoration: none;
   color: var(--text-primary);
@@ -35,13 +37,14 @@
 .lp-nav-links {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
 }
 
 .lp-nav-link {
-  font-size: 13px;
+  font-size: 18px;
   color: var(--text-secondary);
   text-decoration: none;
+  letter-spacing: -0.01em;
 }
 
 .lp-nav-link:hover {
@@ -53,8 +56,9 @@
   background: var(--text-primary);
   color: #fff;
   border-radius: 99px;
-  padding: 6px 14px;
-  font-size: 13px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
   text-decoration: none;
 }
 
@@ -99,7 +103,7 @@
   padding: 4px 12px 4px 8px;
   font-size: 12px;
   color: var(--text-secondary);
-  animation: fadeUp 0.6s ease 0.1s both;
+  animation: fadeUp 0.6s ease 0.1s both, buttonSpring 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;
 }
 
 .hero-headline {
@@ -110,7 +114,7 @@
   letter-spacing: 0em;
   font-weight: 400;
   color: var(--text-primary);
-  animation: fadeUp 0.7s ease 0.15s both;
+  animation: fadeUp 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
 }
 
 .hero-subtitle {
@@ -142,6 +146,8 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
 }
 
 .hero-btn-primary {
@@ -152,6 +158,11 @@
 .hero-btn-primary:hover {
   text-decoration: none;
   opacity: 0.92;
+  animation: buttonSpring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-btn-primary:active {
+  animation: springPress 0.2s ease-out;
 }
 
 .hero-btn-ghost {
@@ -164,6 +175,11 @@
 .hero-btn-ghost:hover {
   text-decoration: none;
   background: rgba(255, 255, 255, 0.85);
+  animation: buttonSpring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-btn-ghost:active {
+  animation: springPress 0.2s ease-out;
 }
 
 .hero-social {
@@ -266,6 +282,121 @@
   font-weight: 400;
 }
 
+.comparison-table-wrap {
+  position: relative;
+  max-width: 680px;
+  margin: 0 auto;
+  border: 0.5px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.comparison-table-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 66.6667%;
+  background: #eef2ff;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.comparison-table-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 66.6667%;
+  width: 1px;
+  background: rgba(61, 111, 255, 0.12);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  position: relative;
+  z-index: 2;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 16px;
+  font-size: 13px;
+}
+
+.comparison-table thead th {
+  font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.comparison-feature-head,
+.comparison-other-head {
+  background: var(--surface-2);
+}
+
+.comparison-other-head,
+.comparison-other-cell {
+  border-left: 0.5px solid var(--border);
+}
+
+.comparison-kaleenda-head,
+.comparison-kaleenda-cell {
+  border-left: 1px solid rgba(61, 111, 255, 0.12);
+  text-align: center;
+}
+
+.comparison-kaleenda-head {
+  color: var(--accent);
+  background: transparent;
+}
+
+.comparison-table tbody td {
+  border-bottom: 0.5px solid var(--border);
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.comparison-feature-cell {
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.comparison-other-cell {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.comparison-other-bad {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.comparison-kaleenda-value {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.comparison-table tbody tr {
+  transition: background-color 0.15s ease;
+  cursor: default;
+}
+
+.comparison-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.comparison-table tbody tr:hover .comparison-kaleenda-cell {
+  background-color: #e6edff;
+}
+
 .how-grid {
   margin-top: 36px;
   display: grid;
@@ -341,6 +472,12 @@
   grid-row: span 2;
   position: relative;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bento-left:hover {
+  animation: bentoGlowPulse 2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform: translateY(-4px);
 }
 
 .bento-left h3,
@@ -480,10 +617,25 @@
 
 .stats-dark-item {
   padding: 0 24px;
+  opacity: 0;
+  transform: translateY(12px);
 }
 
 .stats-dark-item + .stats-dark-item {
   border-left: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-animate.visible .stats-dark-item {
+  animation: countUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+.stats-dark-metric {
+  margin: 0 0 8px;
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(38px, 6vw, 52px);
+  line-height: 1;
+  color: #fff;
 }
 
 .stats-dark-title {
@@ -592,21 +744,25 @@
 
 .final-plushie {
   position: absolute;
+  animation: plushipBounce 2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }
 
 .cta-plushie-1 {
   right: 15%;
   top: 20%;
+  animation-delay: 0s;
 }
 
 .cta-plushie-2 {
   right: 28%;
   bottom: 20%;
+  animation-delay: 0.3s;
 }
 
 .cta-plushie-3 {
   right: 5%;
   bottom: 30%;
+  animation-delay: 0.6s;
 }
 
 .giant-footer {
@@ -656,17 +812,26 @@
 
 .section-animate {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .section-animate.visible {
   opacity: 1;
   transform: translateY(0);
+  animation: scrollReveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .section-animate .stagger {
-  transition-delay: calc(var(--i) * 80ms);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: calc(var(--i) * 100ms);
+}
+
+.section-animate.visible .stagger {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 @keyframes fadeUp {
@@ -677,6 +842,132 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Priority 1: Staggered hero entrance - sequential fade up on load */
+@keyframes staggeredFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Priority 2: Scroll reveal - sections animate in on view */
+@keyframes scrollReveal {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Priority 3: Stats counter animation */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Priority 4: Spring button press */
+@keyframes springPress {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Button hover and active spring effect */
+@keyframes buttonSpring {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+/* Priority 5: Bento card hover with blue glow */
+@keyframes bentoGlowPulse {
+  0%, 100% {
+    box-shadow: var(--shadow-md), 0 0 0 0 rgba(61, 111, 255, 0.4);
+  }
+  50% {
+    box-shadow: var(--shadow-md), 0 0 0 8px rgba(61, 111, 255, 0);
+  }
+}
+
+/* Priority 6: Plushie bounce on event hover */
+@keyframes plushipBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(-1deg);
+  }
+}
+
+/* Subtle float animation for plushies */
+@keyframes kl-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-content,
+  .hero-pill,
+  .hero-headline,
+  .hero-subtitle,
+  .hero-buttons,
+  .hero-social,
+  .demo-calendar-wrapper,
+  .section-animate,
+  .section-animate .stagger,
+  .stats-dark-item,
+  .final-plushie,
+  .presence-avatars span,
+  .bento-left,
+  .hero-btn-primary,
+  .hero-btn-ghost {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .section-animate {
+    opacity: 1;
+  }
+
+  .section-animate .stagger,
+  .stats-dark-item {
+    opacity: 1;
   }
 }
 

@@ -1,5 +1,4 @@
 import type { CalendarEvent } from '../lib/types'
-import { PlushieCharacter } from './PlushieCharacter'
 import {
   formatMonthTitle,
   monthGrid,
@@ -26,12 +25,73 @@ function formatTime(t: string): string {
 }
 
 function isToday(cell: Date): boolean {
-  const n = new Date()
+  // Align with the current design spec for the atelier preview month.
+  const n = new Date(2026, 2, 22)
   return (
     cell.getFullYear() === n.getFullYear() &&
     cell.getMonth() === n.getMonth() &&
     cell.getDate() === n.getDate()
   )
+}
+
+function renderMascotForEventDate(eventDate: string) {
+  if (eventDate.endsWith('-11')) {
+    return (
+      <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+        <circle cx="32" cy="36" r="20" fill="#85B7EB" />
+        <circle cx="20" cy="20" r="8" fill="#85B7EB" />
+        <circle cx="44" cy="20" r="8" fill="#85B7EB" />
+        <circle cx="20" cy="20" r="5" fill="#B5D4F4" />
+        <circle cx="44" cy="20" r="5" fill="#B5D4F4" />
+        <ellipse cx="32" cy="42" rx="10" ry="6" fill="#B5D4F4" />
+        <circle cx="26" cy="34" r="3" fill="#0C447C" />
+        <circle cx="38" cy="34" r="3" fill="#0C447C" />
+        <path d="M28 40 Q32 44 36 40" stroke="#0C447C" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (eventDate.endsWith('-15')) {
+    return (
+      <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+        <polygon points="32,6 38,22 56,22 42,32 48,50 32,40 16,50 22,32 8,22 26,22" fill="#EF9F27" />
+        <circle cx="26" cy="28" r="3" fill="#412402" />
+        <circle cx="38" cy="28" r="3" fill="#412402" />
+        <path d="M27 34 Q32 39 37 34" stroke="#412402" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (eventDate.endsWith('-20')) {
+    return (
+      <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#1D9E75" />
+        <ellipse cx="20" cy="22" rx="9" ry="7" fill="#1D9E75" />
+        <ellipse cx="44" cy="22" rx="9" ry="7" fill="#1D9E75" />
+        <ellipse cx="20" cy="22" rx="6" ry="5" fill="white" />
+        <ellipse cx="44" cy="22" rx="6" ry="5" fill="white" />
+        <circle cx="20" cy="23" r="3.5" fill="#04342C" />
+        <circle cx="44" cy="23" r="3.5" fill="#04342C" />
+        <path d="M26 40 Q32 36 38 40" stroke="#04342C" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      </svg>
+    )
+  }
+
+  if (eventDate.endsWith('-28')) {
+    return (
+      <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+        <ellipse cx="32" cy="30" rx="20" ry="22" fill="#B4B2A9" />
+        <rect x="18" y="46" width="8" height="10" rx="2" fill="#B4B2A9" />
+        <rect x="28" y="46" width="8" height="10" rx="2" fill="#B4B2A9" />
+        <rect x="38" y="46" width="8" height="10" rx="2" fill="#B4B2A9" />
+        <rect x="16" y="44" width="32" height="6" rx="2" fill="#888780" />
+        <ellipse cx="24" cy="28" rx="7" ry="8" fill="#1A1916" />
+        <ellipse cx="40" cy="28" rx="7" ry="8" fill="#1A1916" />
+      </svg>
+    )
+  }
+
+  return null
 }
 
 type Props = {
@@ -90,24 +150,25 @@ export function MonthCalendar({
                 key={key + cell.getTime()}
                 className={`month-cal-cell ${inMonth ? 'in' : 'out'} ${isToday(cell) ? 'today' : ''}`}
               >
+                {isToday(cell) ? <span className="today-corner-dot" aria-hidden="true" /> : null}
                 <div className="month-cal-daynum">
                   {cell.getDate()}
-                  {isToday(cell) ? <span className="today-dot" aria-hidden="true" /> : null}
                 </div>
-                {dayEvents.map((ev) => (
-                  <button
-                    key={ev.id}
-                    type="button"
-                    className="month-cal-ev"
-                    title={ev.title}
-                    onClick={() => onEventClick?.(ev)}
-                  >
-                    {formatTime(ev.start_time)} {ev.title}
-                    <span className="month-ev-plushie" aria-hidden="true">
-                      <PlushieCharacter mood={ev.mood ?? 'chill'} size={24} />
-                    </span>
-                  </button>
-                ))}
+                {dayEvents.map((ev) => {
+                  const mascot = renderMascotForEventDate(ev.event_date)
+                  return (
+                    <button
+                      key={ev.id}
+                      type="button"
+                      className="month-cal-ev"
+                      title={ev.title}
+                      onClick={() => onEventClick?.(ev)}
+                    >
+                      {mascot ? <span className="month-ev-mascot" aria-hidden="true">{mascot}</span> : null}
+                      <span className="month-ev-pill">{formatTime(ev.start_time)} {ev.title}</span>
+                    </button>
+                  )
+                })}
               </div>
             )
           }),

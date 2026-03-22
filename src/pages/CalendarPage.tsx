@@ -23,14 +23,15 @@ import {
 } from '../lib/storage'
 import type { AccessLevel, CalendarEvent, CalendarTheme } from '../lib/types'
 import '../styles/ui.css'
+import './CalendarPage.css'
 
 const themeOptions: Array<{ key: CalendarTheme; label: string; swatch: string }> = [
   { key: 'default', label: 'Default', swatch: '#3d6fff' },
   { key: 'dark', label: 'Dark', swatch: '#2c2c2a' },
   { key: 'pastel', label: 'Pastel', swatch: '#d4537e' },
+  { key: 'sunset', label: 'Sunset', swatch: '#d85a30' },
   { key: 'forest', label: 'Forest', swatch: '#1d9e75' },
   { key: 'midnight', label: 'Midnight', swatch: '#1a2e42' },
-  { key: 'sunset', label: 'Sunset', swatch: '#d85a30' },
 ]
 
 const themeNameByKey: Record<CalendarTheme, string> = {
@@ -382,6 +383,11 @@ export function CalendarPage() {
     () => filterEventsForMonth(events, anchor),
     [events, anchor],
   )
+  const monthLabel = useMemo(
+    () => new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(anchor),
+    [anchor],
+  )
+  const upcomingEvents = useMemo(() => monthEvents.slice(0, 2), [monthEvents])
 
   async function updateTheme(theme: CalendarTheme) {
     if (!authClient || !calendarUuid || !canPickTheme || themeBusy) return
@@ -476,76 +482,129 @@ export function CalendarPage() {
   }
 
   return (
-    <div className="layout calendar-theme-root" data-theme={calendarTheme}>
-      <div className="cal-topbar fade-stage">
-        <Link to="/" className="cal-home-link">
-          ← Home
-        </Link>
-        <div className="cal-top-name">{metaName}</div>
-        <div className="cal-top-right">
-          {canPickTheme ? (
-            <div className="theme-popover-wrap">
-              <button
-                type="button"
-                className="btn-ghost theme-trigger"
-                onClick={() => setThemeOpen((v) => !v)}
-                aria-label="Choose calendar theme"
-              >
-                🎨
-              </button>
-              {themeOpen ? (
-                <div className="theme-popover">
-                  {themeOptions.map((t) => (
-                    <button
-                      key={t.key}
-                      type="button"
-                      className={`theme-swatch ${calendarTheme === t.key ? 'active' : ''}`}
-                      title={t.label}
-                      disabled={themeBusy}
-                      onClick={() => void updateTheme(t.key)}
-                      style={{ '--swatch': t.swatch } as CSSProperties}
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-          <button type="button" className="btn-ghost" onClick={() => void downloadMonthShareCard()} disabled={shareBusy}>
-            {shareBusy ? 'Sharing…' : 'Share card'}
-          </button>
-          <div className="cal-status">
-            <span className={`badge ${isOwner ? 'badge-owner' : canWrite ? 'badge-write' : 'badge-read'}`}>
-              {accessLabel}
-            </span>
+    <div className="layout calendar-theme-root atelier-cal" data-theme={calendarTheme}>
+      <header className="atelier-cal-header fade-stage">
+        <div>
+          <div className="cal-home-row">
+            <Link to="/" className="cal-app-logo" aria-label="Kaleenda home">Kaleenda</Link>
+          </div>
+          <h1 className="atelier-cal-title">{metaName ?? 'Calendar'}</h1>
+          <p className="atelier-cal-month">{monthLabel}</p>
+        </div>
+
+        <div className="atelier-header-right">
+          <div className="atelier-presence-pill" aria-label="Live presence">
+            <span className="atelier-presence-label">Live Presence</span>
             <div className="presence-list" aria-label="Presence">
-              {viewers.slice(0, 5).map((v) => (
+              {viewers.slice(0, 5).map((v, idx) => (
                 <span key={v.key} className="presence-avatar" title={`${v.name} (${v.access})`}>
                   {initials(v.name)}
+                  <span className={`presence-dot ${idx < 3 ? 'online' : 'away'}`} aria-hidden="true" />
                 </span>
               ))}
               {viewers.length > 5 ? <span className="presence-more">+{viewers.length - 5}</span> : null}
             </div>
           </div>
-        </div>
-      </div>
 
-      {isOwner ? (
-        <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 8 }}>
-          <button type="button" className="btn-ghost" onClick={() => setManageOpen(true)}>
-            Manage codes
-          </button>
-        </div>
-      ) : null}
+          <div className="atelier-header-actions">
+            {canPickTheme ? (
+              <div className="theme-popover-wrap">
+                <button
+                  type="button"
+                  className="btn-ghost theme-trigger"
+                  onClick={() => setThemeOpen((v) => !v)}
+                  aria-label="Choose calendar theme"
+                >
+                  Theme
+                </button>
+                {themeOpen ? (
+                  <div className="theme-popover">
+                    {themeOptions.map((t) => (
+                      <button
+                        key={t.key}
+                        type="button"
+                        className={`theme-swatch ${calendarTheme === t.key ? 'active' : ''}`}
+                        title={t.label}
+                        disabled={themeBusy}
+                        onClick={() => void updateTheme(t.key)}
+                        style={{ '--swatch': t.swatch } as CSSProperties}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
-      <div className="fade-stage delay-1">
-        <MonthCalendar
-        anchor={anchor}
-        events={monthEvents}
-        onPrevMonth={() => setAnchor((d) => addMonths(d, -1))}
-        onNextMonth={() => setAnchor((d) => addMonths(d, 1))}
-        showAddHint={canWrite}
-        onEventClick={(ev) => setSelectedEvent(ev)}
-        />
+            <button
+              type="button"
+              className="atelier-share-btn"
+              onClick={() => void downloadMonthShareCard()}
+              disabled={shareBusy}
+            >
+              ↗ Share
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="atelier-workspace fade-stage delay-1">
+        <aside className="atelier-sidebar-card">
+          <div>
+            <h3 className="atelier-section-title">Personalization</h3>
+            <div className="atelier-theme-grid">
+              {themeOptions.slice(0, 4).map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  className={`atelier-theme-chip ${calendarTheme === t.key ? 'active' : ''}`}
+                  disabled={!canPickTheme || themeBusy}
+                  onClick={() => canPickTheme ? void updateTheme(t.key) : undefined}
+                >
+                  <span className="atelier-chip-swatch" style={{ background: t.swatch }} aria-hidden="true" />
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="atelier-upcoming-block">
+            <h3 className="atelier-section-title">Upcoming</h3>
+            <ul className="atelier-upcoming-list">
+              {upcomingEvents.length === 0 ? (
+                <li className="atelier-upcoming-empty">No events this month yet.</li>
+              ) : (
+                upcomingEvents.map((ev) => (
+                  <li key={ev.id} className="atelier-upcoming-item">
+                    <span className="atelier-upcoming-title">{ev.title}</span>
+                    <span className="atelier-upcoming-date">{ev.event_date}</span>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+
+          <div className="atelier-side-actions">
+            <span className={`badge ${isOwner ? 'badge-owner' : canWrite ? 'badge-write' : 'badge-read'}`}>
+              {accessLabel}
+            </span>
+            {isOwner ? (
+              <button type="button" className="btn-ghost" onClick={() => setManageOpen(true)}>
+                Manage codes
+              </button>
+            ) : null}
+          </div>
+        </aside>
+
+        <section>
+          <MonthCalendar
+            anchor={anchor}
+            events={monthEvents}
+            onPrevMonth={() => setAnchor((d) => addMonths(d, -1))}
+            onNextMonth={() => setAnchor((d) => addMonths(d, 1))}
+            showAddHint={canWrite}
+            onEventClick={(ev) => setSelectedEvent(ev)}
+          />
+        </section>
       </div>
 
       {canWrite ? null : (

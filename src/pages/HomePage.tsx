@@ -27,6 +27,39 @@ const steps: Step[] = [
 
 export function HomePage() {
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const animateCounter = (el: HTMLElement) => {
+      if (el.dataset.counted === 'true') return
+
+      const target = Number(el.dataset.countTo ?? '0')
+      const suffix = el.dataset.countSuffix ?? ''
+
+      if (prefersReducedMotion) {
+        el.textContent = `${target}${suffix}`
+        el.dataset.counted = 'true'
+        return
+      }
+
+      const duration = 900
+      const start = performance.now()
+
+      const tick = (now: number) => {
+        const progress = Math.min((now - start) / duration, 1)
+        const eased = 1 - Math.pow(1 - progress, 3)
+        const value = Math.round(target * eased)
+        el.textContent = `${value}${suffix}`
+
+        if (progress < 1) {
+          requestAnimationFrame(tick)
+        } else {
+          el.dataset.counted = 'true'
+        }
+      }
+
+      requestAnimationFrame(tick)
+    }
+
     const sections = Array.from(document.querySelectorAll<HTMLElement>('.section-animate'))
     if (!sections.length) return
 
@@ -35,6 +68,10 @@ export function HomePage() {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible')
+            entry.target
+              .querySelectorAll<HTMLElement>('[data-count-to]')
+              .forEach((counter) => animateCounter(counter))
+            observer.unobserve(entry.target)
           }
         }
       },
@@ -53,9 +90,11 @@ export function HomePage() {
             Kaleenda
           </Link>
           <div className="lp-nav-links">
-            <Link to="/about" className="lp-nav-link">About</Link>
+            <Link to="/about" className="lp-nav-link">Why Kaleenda</Link>
+            <Link to="/how-it-works" className="lp-nav-link">How it works</Link>
             <Link to="/privacy" className="lp-nav-link">Privacy</Link>
-            <Link to="/create" className="lp-nav-cta">Create a calendar →</Link>
+            <Link to="/legal" className="lp-nav-link">Legal</Link>
+            <Link to="/create" className="mp-nav-cta">Create a calendar →</Link>
           </div>
         </div>
       </nav>
@@ -224,15 +263,24 @@ export function HomePage() {
       <section className="section-shell dark section-animate">
         <div className="section-inner stats-dark">
           <div className="stats-dark-item stagger" style={{ '--i': 0 } as CSSProperties}>
-            <h3 className="stats-dark-title">No accounts</h3>
+            <p className="stats-dark-metric">
+              <span data-count-to="0" data-count-suffix="">0</span>
+            </p>
+            <h3 className="stats-dark-title">Accounts required</h3>
             <p className="stats-dark-copy">The only calendar anyone can join.</p>
           </div>
           <div className="stats-dark-item stagger" style={{ '--i': 1 } as CSSProperties}>
-            <h3 className="stats-dark-title">2 access levels</h3>
+            <p className="stats-dark-metric">
+              <span data-count-to="2" data-count-suffix="">0</span>
+            </p>
+            <h3 className="stats-dark-title">Access levels</h3>
             <p className="stats-dark-copy">Write or read — you decide.</p>
           </div>
           <div className="stats-dark-item stagger" style={{ '--i': 2 } as CSSProperties}>
-            <h3 className="stats-dark-title">Works everywhere</h3>
+            <p className="stats-dark-metric">
+              <span data-count-to="100" data-count-suffix="%">0%</span>
+            </p>
+            <h3 className="stats-dark-title">Browser-ready</h3>
             <p className="stats-dark-copy">Any device. Just a link.</p>
           </div>
         </div>

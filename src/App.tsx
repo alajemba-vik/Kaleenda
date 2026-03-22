@@ -66,10 +66,15 @@ const LegalPage = lazy(async () => {
   const mod = await import('./pages/LegalPage')
   return { default: mod.LegalPage }
 })
+const HowItWorksPage = lazy(async () => {
+  const mod = await import('./pages/HowItWorksPage')
+  return { default: mod.HowItWorksPage }
+})
 
 export default function App() {
   const location = useLocation()
-  const showGlobalFooter = location.pathname !== '/'
+  const standaloneMarketingRoutes = new Set(['/about', '/privacy', '/legal', '/how-it-works'])
+  const showGlobalFooter = location.pathname !== '/' && !standaloneMarketingRoutes.has(location.pathname)
 
   return (
     <div className="app-shell">
@@ -82,6 +87,7 @@ export default function App() {
             <Route path="/join" element={<JoinPage />} />
             <Route path="/cal/:calendarId" element={<CalendarPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/legal" element={<LegalPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

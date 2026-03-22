@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import '../styles/ui.css'
 import './WelcomeCodes.css'
@@ -30,6 +30,8 @@ export function ManageCodesModal({
   const [ownerCode, setOwnerCode] = useState(initialOwner ?? '')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [confirmPending, setConfirmPending] = useState(false)
+  const confirmTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -66,6 +68,13 @@ export function ManageCodesModal({
 
   if (!open) return null
 
+  function clearConfirmTimer() {
+    if (confirmTimerRef.current !== null) {
+      window.clearTimeout(confirmTimerRef.current)
+      confirmTimerRef.current = null
+    }
+  }
+
   async function copy(t: string) {
     try {
       await navigator.clipboard.writeText(t)
@@ -92,6 +101,30 @@ export function ManageCodesModal({
     }
   }
 
+  function handleRegenerateClick() {
+    if (busy) return
+    if (!confirmPending) {
+      setConfirmPending(true)
+      clearConfirmTimer()
+      confirmTimerRef.current = window.setTimeout(() => {
+        setConfirmPending(false)
+        confirmTimerRef.current = null
+      }, 4000)
+      return
+    }
+    clearConfirmTimer()
+    setConfirmPending(false)
+    void regenerate()
+  }
+
+  useEffect(() => {
+    if (!open) {
+      setConfirmPending(false)
+      clearConfirmTimer()
+    }
+    return () => clearConfirmTimer()
+  }, [open])
+
   return (
     <div className="mc-backdrop" role="presentation" onClick={() => onClose()}>
       <div
@@ -102,9 +135,12 @@ export function ManageCodesModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mc-head">
-          <h2 id="mc-title" className="mc-title">
-            Manage codes
-          </h2>
+          <div>
+            <div className="mc-wordmark">Kaleenda</div>
+            <h2 id="mc-title" className="mc-title">
+              Manage codes
+            </h2>
+          </div>
           <button type="button" className="mc-x" onClick={() => onClose()} aria-label="Close">
             ×
           </button>
@@ -138,8 +174,7 @@ export function ManageCodesModal({
               </button>
             </div>
             <p className="page-sub mc-hint">
-              Regenerating invalidates the previous write and read codes. Share the new codes with
-              your group.
+              Regenerating creates new codes and immediately locks out anyone using the old ones.
             </p>
             <div className="row">
               {onDeleteCalendar ? (
@@ -155,8 +190,14 @@ export function ManageCodesModal({
               <button type="button" className="btn-secondary btn" onClick={() => onClose()}>
                 Close
               </button>
-              <button type="button" className="btn" onClick={() => regenerate()} disabled={busy}>
-                {busy ? 'Working…' : 'Regenerate codes'}
+              <button
+                id="regen-btn"
+                type="button"
+                className={`btn mc-regen-btn ${confirmPending ? 'confirming' : ''}`}
+                onClick={handleRegenerateClick}
+                disabled={busy}
+              >
+                {busy ? 'Working…' : confirmPending ? 'Tap again to confirm' : 'Regenerate codes'}
               </button>
             </div>
           </>

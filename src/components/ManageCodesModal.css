@@ -27,6 +27,15 @@
   margin-bottom: 12px;
 }
 
+.mc-wordmark {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: #1a1916;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
 .mc-title {
   font-size: 1.08rem;
   font-weight: 600;
@@ -56,6 +65,7 @@
 
 .mc-code-box {
   margin-bottom: 12px;
+  border-radius: 12px;
 }
 
 .mc-hint {
@@ -70,5 +80,19 @@
 
 .mc-danger:hover:not(:disabled) {
   filter: brightness(0.95);
+}
+
+.mc-regen-btn {
+  background: #1a1916;
+  color: #fff;
+}
+
+.mc-regen-btn:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.mc-regen-btn.confirming {
+  background: #e24b4a;
+  color: #fff;
 }
 

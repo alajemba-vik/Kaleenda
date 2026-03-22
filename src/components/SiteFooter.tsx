@@ -7,7 +7,8 @@ export function SiteFooter() {
         <p className="site-footer-tagline">No account needed. No tracking. Just shared calendars.</p>
         <nav className="site-footer-links" aria-label="Footer links">
           <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
+          <Link to="/about">Why Kaleenda</Link>
+          <Link to="/how-it-works">How it works</Link>
           <Link to="/privacy">Privacy</Link>
           <Link to="/legal">Legal</Link>
         </nav>

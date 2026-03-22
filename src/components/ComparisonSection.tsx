@@ -2,7 +2,7 @@ const rows = [
   { feature: 'Requires an account', others: '✕ Everyone needs one', kaleenda: '✓ Nobody does', isOtherBad: true },
   { feature: 'Share with a link', others: 'Sometimes', kaleenda: '✓ Always', isOtherBad: false },
   { feature: 'Two access levels', others: '✕', kaleenda: '✓ Write and read', isOtherBad: true },
-  { feature: 'Works for temporary groups', others: '✕ Designed for teams', kaleenda: '✓ Built for this', isOtherBad: true },
+  { feature: 'Temporary groups', others: '✕ Designed for teams', kaleenda: '✓ Built for this', isOtherBad: true },
   { feature: 'Fun to use', others: '✕', kaleenda: '✓ Plushies', isOtherBad: true },
 ]
 
@@ -17,26 +17,31 @@ export function ComparisonSection() {
           Other shared calendars require everyone to have an account. Kaleenda doesn't.
         </p>
 
-        <div style={{ maxWidth: 600, margin: '0 auto', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', overflow: 'hidden' }}>
-          {/* Header */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: 'var(--surface-2)', borderBottom: '0.5px solid var(--border)' }}>
-            <div style={{ padding: '16px', fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>Feature</div>
-            <div style={{ padding: '16px', fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', borderLeft: '0.5px solid var(--border)' }}>Other calendars</div>
-            <div style={{ padding: '16px', fontSize: 13, fontWeight: 500, color: 'var(--accent)', background: 'var(--accent-light)', borderLeft: '0.5px solid var(--border)' }}>Kaleenda</div>
-          </div>
-
-          {/* Rows */}
-          {rows.map((row, idx) => (
-            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', borderBottom: '0.5px solid var(--border)' }}>
-              <div style={{ padding: '16px', fontSize: 13, color: 'var(--text-primary)' }}>{row.feature}</div>
-              <div style={{ padding: '16px', fontSize: 13, color: row.isOtherBad ? 'var(--danger)' : 'var(--text-secondary)', borderLeft: '0.5px solid var(--border)', textAlign: 'center', fontWeight: row.isOtherBad ? 500 : 400 }}>
-                {row.others}
-              </div>
-              <div style={{ padding: '16px', fontSize: 13, color: 'var(--text-secondary)', borderLeft: '0.5px solid var(--border)', textAlign: 'center', background: 'var(--accent-light)' }}>
-                <span style={{ color: 'var(--success)', fontWeight: 600 }}>{row.kaleenda}</span>
-              </div>
-            </div>
-          ))}
+        <div className="comparison-table-wrap">
+          <table className="comparison-table" aria-label="Kaleenda comparison table">
+            <thead>
+              <tr>
+                <th className="comparison-feature-head">Feature</th>
+                <th className="comparison-other-head">Other calendars</th>
+                <th className="comparison-kaleenda-head">Kaleenda</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.feature}>
+                  <td className="comparison-feature-cell">{row.feature}</td>
+                  <td
+                    className={`comparison-other-cell ${row.isOtherBad ? 'comparison-other-bad' : ''}`}
+                  >
+                    {row.others}
+                  </td>
+                  <td className="comparison-kaleenda-cell">
+                    <span className="comparison-kaleenda-value">{row.kaleenda}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </section>

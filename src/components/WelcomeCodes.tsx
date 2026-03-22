@@ -116,7 +116,7 @@ export function WelcomeCodes({
 
     setEmailBusy(true)
     try {
-      const { error } = await anon.functions.invoke('send_codes_email', {
+      const { data, error } = await anon.functions.invoke('send_codes_email', {
         body: {
           calendar_id: calendarId,
           email: trimmed,
@@ -130,12 +130,35 @@ export function WelcomeCodes({
           createdAt,
         },
       })
-      if (error) throw error
+
+      if (error) {
+        const baseMessage = error instanceof Error ? error.message : ''
+        if (baseMessage.includes('Edge Function returned a non-2xx status code')) {
+          const context = (error as { context?: Response }).context
+          if (context) {
+            const responseBody = await context.text()
+            throw new Error(responseBody || baseMessage)
+          }
+        }
+        throw error
+      }
+
+      const payload = (data ?? {}) as { skipped?: boolean }
+      if (payload.skipped) {
+        setEmailError('Email sending is disabled right now. Please ask an admin to enable EMAIL_ENABLED in Supabase secrets.')
+        return
+      }
+
       setEmailSentTo(trimmed)
       setEmail('')
     } catch (e) {
       const msg = e instanceof Error && e.message ? e.message : 'Could not send email right now.'
-      if (msg.includes('Failed to send a request to the Edge Function')) {
+      if (
+        msg.includes('NOT_FOUND') ||
+        msg.includes('Requested function was not found')
+      ) {
+        setEmailError('Email service is not deployed yet (send_codes_email). Please deploy the function and try again.')
+      } else if (msg.includes('Failed to send a request to the Edge Function')) {
         setEmailError('Email service is unavailable right now. Please try again in a minute.')
       } else {
         setEmailError(msg)
@@ -158,7 +181,7 @@ export function WelcomeCodes({
         <div className="code-box write">
           <div className="code-box-lbl">Write code</div>
           <div className="code-box-line">
-            <div className="code-box-val mono">{writeCode}</div>
+            <div className="code-box-val mono" data-code="write">{writeCode}</div>
             <button type="button" className="copy-chip" onClick={() => void copyWithFeedback('write', writeCode)}>
               <span className={`copy-icon ${copiedKey === 'write' ? 'is-hidden' : 'is-visible'}`} aria-hidden="true">
                 ⧉
@@ -173,7 +196,7 @@ export function WelcomeCodes({
         <div className="code-box read">
           <div className="code-box-lbl">Read code</div>
           <div className="code-box-line">
-            <div className="code-box-val mono">{readCode}</div>
+            <div className="code-box-val mono" data-code="read">{readCode}</div>
             <button type="button" className="copy-chip" onClick={() => void copyWithFeedback('read', readCode)}>
               <span className={`copy-icon ${copiedKey === 'read' ? 'is-hidden' : 'is-visible'}`} aria-hidden="true">
                 ⧉
@@ -190,7 +213,7 @@ export function WelcomeCodes({
         <div className="code-box owner">
           <div className="code-box-lbl owner-pill-label">OWNER CODE</div>
           <div className="code-box-line">
-            <div className={`code-box-val owner-code mono ${safeOwnerCode ? '' : 'owner-code-missing'}`}>
+            <div className={`code-box-val owner-code mono ${safeOwnerCode ? '' : 'owner-code-missing'}`} data-code="owner">
               {safeOwnerCode || 'Unavailable - apply owner code migration'}
             </div>
             {safeOwnerCode ? (
@@ -225,8 +248,11 @@ export function WelcomeCodes({
         </button>
       </div>
 
-      <button type="button" className="btn welcome-save-btn" onClick={() => void onSaveCard()} disabled={saveBusy}>
-        {saveBusy ? 'Generating key card...' : 'Save your codes'}
+      <button type="button" className="welcome-download-btn" onClick={() => void onSaveCard()} disabled={saveBusy}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 2v8M5 7l3 3 3-3M2 11v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="#1A1916" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        {saveBusy ? 'Generating key card...' : 'Download key card'}
       </button>
       {saveError ? <p className="error-text welcome-inline-feedback">{saveError}</p> : null}
 
@@ -252,7 +278,7 @@ export function WelcomeCodes({
               onClick={() => void onSendEmail()}
               disabled={emailBusy}
             >
-              {emailBusy ? 'Sending...' : 'Send to my email'}
+              {emailBusy ? 'Sending...' : 'Send to email'}
             </button>
           </div>
           {emailError ? <p className="error-text welcome-inline-feedback">{emailError}</p> : null}
@@ -268,6 +294,20 @@ export function WelcomeCodes({
       <button type="button" className="btn btn-secondary welcome-cta" onClick={() => onContinue()}>
         Open my calendar →
       </button>
+
+      <div className="welcome-star-wrap" aria-hidden="true">
+        <div className="welcome-star-bounce">
+          <svg viewBox="0 0 64 64" width="56" height="56">
+            <polygon points="32,6 38,22 56,22 42,32 48,50 32,40 16,50 22,32 8,22 26,22" fill="#EF9F27" />
+            <circle cx="26" cy="28" r="3" fill="#412402" />
+            <circle cx="38" cy="28" r="3" fill="#412402" />
+            <path d="M27 34 Q32 39 37 34" stroke="#412402" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+            <circle cx="12" cy="10" r="3" fill="#F4C0D1" opacity="0.8" />
+            <circle cx="52" cy="8" r="2" fill="#9FE1CB" opacity="0.8" />
+            <circle cx="56" cy="20" r="2.5" fill="#AFA9EC" opacity="0.8" />
+          </svg>
+        </div>
+      </div>
 
       <div className="keycard-capture-host" aria-hidden="true">
         <div ref={keyCardRef} className="keycard">

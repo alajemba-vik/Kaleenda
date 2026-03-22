@@ -58,6 +58,7 @@
 }
 
 .month-cal-cell {
+  position: relative;
   background: var(--cal-surface);
   padding: 6px;
   height: 80px;
@@ -77,39 +78,47 @@
 .month-cal-daynum {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   font-size: 11px;
   font-weight: 500;
   margin-bottom: 2px;
 }
 
-.today-dot {
-  width: 6px;
-  height: 6px;
+.month-cal-cell.today {
+  background: rgba(61, 111, 255, 0.04);
+}
+
+.month-cal-cell.today .month-cal-daynum {
+  color: #3d6fff;
+  font-weight: 500;
+}
+
+.today-corner-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
   border-radius: 999px;
-  background: var(--cal-today);
+  background: #3d6fff;
 }
 
 .month-cal-ev {
   width: 100%;
-  text-align: left;
-  border: 1px solid color-mix(in srgb, var(--cal-event-text) 30%, transparent);
+  text-align: center;
+  border: none;
   font-size: 11px;
-  background: var(--cal-event);
+  background: transparent;
   color: var(--cal-event-text);
   border-radius: 6px;
-  padding: 2px 6px;
+  padding: 0;
   margin-top: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   cursor: pointer;
-  position: relative;
-  overflow: visible;
+  display: grid;
+  justify-items: center;
 }
 
 .month-cal-ev:hover {
-  border-color: color-mix(in srgb, var(--cal-event-text) 45%, transparent);
+  opacity: 0.92;
 }
 
 .month-cal-ev:focus-visible {
@@ -117,17 +126,22 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--cal-today) 30%, transparent);
 }
 
-.month-ev-plushie {
-  position: absolute;
-  top: -12px;
-  right: 4px;
-  width: 24px;
-  height: 24px;
-  transition: transform 150ms var(--ease-standard);
+.month-ev-mascot {
+  display: block;
+  margin-bottom: 4px;
+  line-height: 0;
 }
 
-.month-cal-ev:hover .month-ev-plushie {
-  transform: scale(1.1667);
+.month-ev-pill {
+  max-width: 100%;
+  border-radius: 999px;
+  background: var(--cal-event);
+  border: 1px solid color-mix(in srgb, var(--cal-event-text) 30%, transparent);
+  color: var(--cal-event-text);
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .month-empty {

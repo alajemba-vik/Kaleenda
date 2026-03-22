@@ -39,11 +39,7 @@ export function MiniCalendarPreview({ theme: overrideTheme }: Props) {
     const timer = setInterval(() => {
       setIsTransitioning(true)
       setTimeout(() => {
-        setCurrentThemeIndex((prev) => {
-          const next = (prev + 1) % THEMES.length
-          console.log(`[MiniCalendarPreview] Theme cycle: ${THEMES[prev]} → ${THEMES[next]}`)
-          return next
-        })
+        setCurrentThemeIndex((prev) => (prev + 1) % THEMES.length)
         setIsTransitioning(false)
       }, THEME_TRANSITION_DURATION / 2)
     }, THEME_CYCLE_INTERVAL)
@@ -95,7 +91,7 @@ export function MiniCalendarPreview({ theme: overrideTheme }: Props) {
       <div
         style={{
           maxWidth: 480,
-          pointerEvents: 'none',
+          pointerEvents: 'auto',
           transform: 'scale(0.85)',
           transformOrigin: 'top center',
           overflow: 'hidden',
