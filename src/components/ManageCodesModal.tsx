@@ -11,6 +11,8 @@ type Props = {
   sessionToken: string
   initialWrite?: string
   initialRead?: string
+  initialOwner?: string
+  onDeleteCalendar?: () => Promise<void>
 }
 
 export function ManageCodesModal({
@@ -20,18 +22,22 @@ export function ManageCodesModal({
   sessionToken,
   initialWrite,
   initialRead,
+  initialOwner,
+  onDeleteCalendar,
 }: Props) {
   const [writeCode, setWriteCode] = useState(initialWrite ?? '')
   const [readCode, setReadCode] = useState(initialRead ?? '')
+  const [ownerCode, setOwnerCode] = useState(initialOwner ?? '')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
     setErr(null)
-    if (initialWrite && initialRead) {
+    if (initialWrite && initialRead && initialOwner) {
       setWriteCode(initialWrite)
       setReadCode(initialRead)
+      setOwnerCode(initialOwner)
       return
     }
     let cancelled = false
@@ -43,9 +49,10 @@ export function ManageCodesModal({
         })
         if (cancelled) return
         if (error) throw error
-        const j = data as { write_code?: string; read_code?: string }
+        const j = data as { write_code?: string; read_code?: string; owner_code?: string }
         setWriteCode(j.write_code ?? '')
         setReadCode(j.read_code ?? '')
+        setOwnerCode(j.owner_code ?? '')
       } catch (e) {
         if (!cancelled) setErr(e instanceof Error ? e.message : 'Could not load codes')
       } finally {
@@ -55,7 +62,7 @@ export function ManageCodesModal({
     return () => {
       cancelled = true
     }
-  }, [open, anon, sessionToken, initialWrite, initialRead])
+  }, [open, anon, sessionToken, initialWrite, initialRead, initialOwner])
 
   if (!open) return null
 
@@ -104,30 +111,47 @@ export function ManageCodesModal({
         </div>
         {err ? <p className="error-text">{err}</p> : null}
         {busy && !writeCode && !readCode ? (
-          <p className="page-sub" style={{ marginBottom: 0 }}>
+          <p className="page-sub mc-loading">
             Loading…
           </p>
         ) : (
           <>
-            <div className="code-box write" style={{ marginBottom: 10 }}>
+            <div className="code-box write mc-code-box">
               <div className="code-box-lbl">Write code</div>
-              <div className="code-box-val mono">{writeCode}</div>
+              <div className="code-box-val mono">{writeCode || 'Unavailable'}</div>
               <button type="button" className="link-btn" onClick={() => copy(writeCode)}>
                 Copy
               </button>
             </div>
-            <div className="code-box read" style={{ marginBottom: 10 }}>
+            <div className="code-box read mc-code-box">
               <div className="code-box-lbl">Read code</div>
-              <div className="code-box-val mono">{readCode}</div>
+              <div className="code-box-val mono">{readCode || 'Unavailable'}</div>
               <button type="button" className="link-btn" onClick={() => copy(readCode)}>
                 Copy
               </button>
             </div>
-            <p className="page-sub" style={{ fontSize: '0.8rem', marginBottom: 12 }}>
+            <div className="code-box owner mc-code-box">
+              <div className="code-box-lbl">Owner code</div>
+              <div className="code-box-val mono">{ownerCode || 'Unavailable'}</div>
+              <button type="button" className="link-btn" onClick={() => copy(ownerCode)}>
+                Copy
+              </button>
+            </div>
+            <p className="page-sub mc-hint">
               Regenerating invalidates the previous write and read codes. Share the new codes with
               your group.
             </p>
             <div className="row">
+              {onDeleteCalendar ? (
+                <button
+                  type="button"
+                  className="btn mc-danger"
+                  onClick={() => void onDeleteCalendar()}
+                  disabled={busy}
+                >
+                  Delete calendar
+                </button>
+              ) : null}
               <button type="button" className="btn-secondary btn" onClick={() => onClose()}>
                 Close
               </button>

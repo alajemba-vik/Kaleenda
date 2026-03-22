@@ -24,13 +24,22 @@ function formatTime(t: string): string {
   return t.slice(0, 5)
 }
 
+function isToday(cell: Date): boolean {
+  const n = new Date()
+  return (
+    cell.getFullYear() === n.getFullYear() &&
+    cell.getMonth() === n.getMonth() &&
+    cell.getDate() === n.getDate()
+  )
+}
+
 type Props = {
   anchor: Date
   events: CalendarEvent[]
   onPrevMonth: () => void
   onNextMonth: () => void
   showAddHint?: boolean
-  onAddEvent?: () => void
+  onEventClick?: (ev: CalendarEvent) => void
 }
 
 export function MonthCalendar({
@@ -39,7 +48,7 @@ export function MonthCalendar({
   onPrevMonth,
   onNextMonth,
   showAddHint,
-  onAddEvent,
+  onEventClick,
 }: Props) {
   const weeks = monthGrid(anchor)
   const byDay = new Map<string, CalendarEvent[]>()
@@ -61,18 +70,6 @@ export function MonthCalendar({
         <button type="button" className="month-nav" onClick={onNextMonth} aria-label="Next month">
           ›
         </button>
-        {showAddHint ? (
-          <button
-            type="button"
-            className="month-add-hint month-add-btn"
-            onClick={onAddEvent}
-            aria-label="Add event"
-          >
-            + Add event
-          </button>
-        ) : (
-          <span className="month-add-hint muted" />
-        )}
       </div>
       <div className="month-cal-grid">
         {weekdays.map((d) => (
@@ -88,19 +85,49 @@ export function MonthCalendar({
             return (
               <div
                 key={key + cell.getTime()}
-                className={`month-cal-cell ${inMonth ? 'in' : 'out'}`}
+                className={`month-cal-cell ${inMonth ? 'in' : 'out'} ${isToday(cell) ? 'today' : ''}`}
               >
-                <div className="month-cal-daynum">{cell.getDate()}</div>
+                <div className="month-cal-daynum">
+                  {cell.getDate()}
+                  {isToday(cell) ? <span className="today-dot" aria-hidden="true" /> : null}
+                </div>
                 {dayEvents.map((ev) => (
-                  <div key={ev.id} className="month-cal-ev" title={ev.title}>
+                  <button
+                    key={ev.id}
+                    type="button"
+                    className="month-cal-ev"
+                    title={ev.title}
+                    onClick={() => onEventClick?.(ev)}
+                  >
                     {formatTime(ev.start_time)} {ev.title}
-                  </div>
+                  </button>
                 ))}
               </div>
             )
           }),
         )}
       </div>
+      {events.length === 0 ? (
+        <div className="month-empty">
+          <svg
+            className="month-empty-ill"
+            viewBox="0 0 64 64"
+            fill="none"
+            aria-hidden="true"
+          >
+            <rect x="10" y="14" width="44" height="40" rx="8" stroke="currentColor" strokeWidth="2" />
+            <path d="M10 24H54" stroke="currentColor" strokeWidth="2" />
+            <path d="M21 10V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M43 10V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <div>No events yet</div>
+          <span>
+            {showAddHint
+              ? 'Use the blue + button to add the first event.'
+              : 'Ask an owner for write access to add events.'}
+          </span>
+        </div>
+      ) : null}
     </div>
   )
 }

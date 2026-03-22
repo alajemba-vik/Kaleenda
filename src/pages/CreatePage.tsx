@@ -30,7 +30,6 @@ export function CreatePage() {
   const nav = useNavigate()
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
-  const [remember, setRemember] = useState(true)
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -50,19 +49,18 @@ export function CreatePage() {
         public_id: string
         write_code: string
         read_code: string
+        owner_code: string
         owner_session_token: string
       }
-      if (remember) {
-        writeStoredSession(j.public_id, j.owner_session_token, 'owner' as AccessLevel)
-      }
+      writeStoredSession(j.public_id, j.owner_session_token, 'owner' as AccessLevel)
       nav(`/cal/${encodeURIComponent(j.public_id)}`, {
         replace: false,
         state: {
           fromCreate: true,
           writeCode: j.write_code,
           readCode: j.read_code,
+          ownerCode: j.owner_code,
           ownerSessionToken: j.owner_session_token,
-          remember,
         },
       })
     } catch (er: unknown) {
@@ -74,9 +72,10 @@ export function CreatePage() {
 
   return (
     <div className="layout">
-      <div style={{ maxWidth: 480 }}>
+      <div className="surface-card" style={{ maxWidth: 560 }}>
+        <p className="kicker">Create</p>
         <h1 className="page-title">Name your calendar</h1>
-        <p className="page-sub">Give it a name so people know what they&apos;re joining.</p>
+        <p className="page-sub">Give it a clear name so everyone knows what they are joining.</p>
         {err ? <p className="error-text">{err}</p> : null}
         <form onSubmit={onSubmit}>
           <label className="sr-only" htmlFor="name">
@@ -91,26 +90,15 @@ export function CreatePage() {
             disabled={busy}
             required
           />
-          <label className="chk">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
-              disabled={busy}
-            />
-            <span>Remember this device — skip code next time</span>
-          </label>
-          <div className="row">
+          <div className="row" style={{ justifyContent: 'flex-start', gap: 8 }}>
             <button className="btn" type="submit" disabled={busy}>
               {busy ? 'Creating…' : 'Create calendar →'}
             </button>
-            <Link to="/" className="btn-secondary btn" style={{ textAlign: 'center' }}>
+            <Link to="/" className="btn-ghost btn">
               Cancel
             </Link>
           </div>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 10 }}>
-            No account needed
-          </p>
+          <p className="meta-note">No account needed.</p>
         </form>
       </div>
     </div>

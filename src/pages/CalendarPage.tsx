@@ -2,15 +2,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { AddEventPanel } from '../components/AddEventPanel'
 import { CodeEntry } from '../components/CodeEntry'
+import { EventDetailModal } from '../components/EventDetailModal'
 import { ManageCodesModal } from '../components/ManageCodesModal'
 import { filterEventsForMonth, MonthCalendar } from '../components/MonthCalendar'
 import { WelcomeCodes } from '../components/WelcomeCodes'
 import { addMonths } from '../lib/calendarGrid'
+import { randomAnonymousName } from '../lib/anonymousName'
 import { createAnonClient, createAuthClient } from '../lib/supabase'
 import { exchangeSessionJwt } from '../lib/session'
 import {
   clearStoredSession,
+  readCreatorName,
   readStoredSession,
+  writeCreatorName,
   writeStoredSession,
 } from '../lib/storage'
 import type { AccessLevel, CalendarEvent } from '../lib/types'
@@ -20,11 +24,17 @@ type CreateNavState = {
   fromCreate?: boolean
   writeCode?: string
   readCode?: string
+  ownerCode?: string
   ownerSessionToken?: string
-  remember?: boolean
 }
 
 type Phase = 'boot' | 'notfound' | 'welcome' | 'code' | 'calendar'
+
+type Viewer = {
+  key: string
+  name: string
+  access: AccessLevel
+}
 
 function mergeById(prev: CalendarEvent[], row: CalendarEvent): CalendarEvent[] {
   const i = prev.findIndex((e) => e.id === row.id)
@@ -48,11 +58,15 @@ export function CalendarPage() {
   const [jwt, setJwt] = useState<string | null>(null)
   const [calendarUuid, setCalendarUuid] = useState<string | null>(null)
   const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+  const [deletingEvent, setDeletingEvent] = useState(false)
+  const [viewers, setViewers] = useState<Viewer[]>([])
 
   const [anchor, setAnchor] = useState(() => new Date())
   const [codeError, setCodeError] = useState<string | null>(null)
   const [codeBusy, setCodeBusy] = useState(false)
   const [rememberDevice, setRememberDevice] = useState(true)
+  const [creatorName, setCreatorName] = useState<string>(() => readCreatorName(calendarId) ?? '')
 
   const [addOpen, setAddOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
@@ -71,6 +85,13 @@ export function CalendarPage() {
 
   const canWrite = accessLevel === 'owner' || accessLevel === 'write'
   const isOwner = accessLevel === 'owner'
+  const accessLabel = isOwner ? 'Owner' : accessLevel === 'write' ? 'Write' : 'View only'
+
+  function initials(name: string): string {
+    const parts = name.trim().split(/\s+/)
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+    return `${parts[0][0] ?? ''}${parts[1][0] ?? ''}`.toUpperCase()
+  }
 
   const establishSession = useCallback(
     async (token: string, access: AccessLevel) => {
@@ -103,6 +124,10 @@ export function CalendarPage() {
 
   useEffect(() => {
     establishedRef.current = null
+  }, [calendarId])
+
+  useEffect(() => {
+    setCreatorName(readCreatorName(calendarId) ?? '')
   }, [calendarId])
 
   useEffect(() => {
@@ -168,8 +193,16 @@ export function CalendarPage() {
   useEffect(() => {
     if (!authClient || !calendarUuid || !jwt) return
 
+    const fallbackName = readCreatorName(calendarId) ?? randomAnonymousName()
+    if (!readCreatorName(calendarId)) {
+      writeCreatorName(calendarId, fallbackName)
+      setCreatorName(fallbackName)
+    }
+
     const channel = authClient
-      .channel(`events:${calendarUuid}`)
+      .channel(`events:${calendarUuid}`, {
+        config: { presence: { key: `${sessionToken ?? 'viewer'}:${calendarUuid}` } },
+      })
       .on(
         'postgres_changes',
         {
@@ -191,12 +224,53 @@ export function CalendarPage() {
           }
         },
       )
-      .subscribe()
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState() as Record<string, Array<{ name?: string; access?: string }>>
+        const next = Object.entries(state).map(([key, list]) => {
+          const first = list[0] ?? {}
+          const access = first.access === 'owner' || first.access === 'write' || first.access === 'read'
+            ? (first.access as AccessLevel)
+            : 'read'
+          return {
+            key,
+            name: first.name || 'Anonymous',
+            access,
+          }
+        })
+        setViewers(next)
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ name: fallbackName, access: accessLevel ?? 'read' })
+        }
+      })
 
     return () => {
       void authClient.removeChannel(channel)
     }
-  }, [authClient, calendarUuid, jwt])
+  }, [accessLevel, authClient, calendarId, calendarUuid, jwt, sessionToken])
+
+  async function deleteCalendar() {
+    if (!authClient || !calendarUuid) return
+    const ok = window.confirm('Delete this calendar permanently? This removes all events for everyone.')
+    if (!ok) return
+    const { error } = await authClient.from('calendars').delete().eq('id', calendarUuid)
+    if (error) throw new Error(error.message)
+    clearStoredSession(calendarId)
+    nav('/', { replace: true })
+  }
+
+  async function deleteEvent(ev: CalendarEvent) {
+    if (!authClient) return
+    setDeletingEvent(true)
+    try {
+      const { error } = await authClient.from('events').delete().eq('id', ev.id)
+      if (error) throw new Error(error.message)
+      setSelectedEvent(null)
+    } finally {
+      setDeletingEvent(false)
+    }
+  }
 
   async function onJoinCode(code: string) {
     setCodeError(null)
@@ -248,15 +322,18 @@ export function CalendarPage() {
     return (
       <div className="layout">
         {phase === 'boot' ? (
-          <div>
+          <div className="surface-card" style={{ maxWidth: 560 }}>
+            <p className="kicker">Preparing</p>
             <h1 className="page-title">Checking access…</h1>
             <p className="page-sub">Hang on while we verify this link.</p>
           </div>
         ) : null}
         {phase === 'welcome' && createState?.writeCode && createState.readCode ? (
           <WelcomeCodes
+            calendarName={metaName ?? 'Calendar'}
             writeCode={createState.writeCode}
             readCode={createState.readCode}
+            ownerCode={createState.ownerCode ?? ''}
             shareUrl={shareUrl}
             onContinue={() => void onWelcomeContinue()}
           />
@@ -268,11 +345,14 @@ export function CalendarPage() {
   if (phase === 'notfound') {
     return (
       <div className="layout">
-        <h1 className="page-title">Calendar not found</h1>
-        <p className="page-sub">This link may be wrong or the calendar was removed.</p>
-        <Link className="btn" to="/">
-          Go home
-        </Link>
+        <div className="surface-card" style={{ maxWidth: 560 }}>
+          <p className="kicker">Not Found</p>
+          <h1 className="page-title">Calendar not found</h1>
+          <p className="page-sub">This link may be wrong, expired, or the calendar was removed.</p>
+          <Link className="btn" to="/">
+            Go home
+          </Link>
+        </div>
       </div>
     )
   }
@@ -280,7 +360,7 @@ export function CalendarPage() {
   if (phase === 'code') {
     return (
       <div className="layout">
-        <div className="row" style={{ marginBottom: 18 }}>
+        <div className="row top-nav">
           <Link to="/" className="link-btn">
             ← Home
           </Link>
@@ -299,59 +379,70 @@ export function CalendarPage() {
 
   return (
     <div className="layout">
-      <div className="row" style={{ marginBottom: 14 }}>
-        <Link to="/" className="link-btn">
+      <div className="cal-topbar fade-stage">
+        <Link to="/" className="cal-home-link">
           ← Home
         </Link>
-        {isOwner ? (
-          <button type="button" className="btn-ghost" onClick={() => setManageOpen(true)}>
-            Manage codes
-          </button>
-        ) : null}
-      </div>
-
-      <div className="row" style={{ marginBottom: 12, alignItems: 'flex-start' }}>
-        <div>
-          <h1 className="page-title" style={{ marginBottom: 6 }}>
-            {metaName}
-          </h1>
-          <div>
-            {isOwner ? <span className="badge badge-owner">Owner</span> : null}
-            {!isOwner && accessLevel === 'write' ? (
-              <span className="badge badge-write">Write access</span>
-            ) : null}
-            {!isOwner && accessLevel === 'read' ? (
-              <span className="badge badge-read">View only</span>
-            ) : null}
+        <div className="cal-top-name">{metaName}</div>
+        <div className="cal-top-right">
+          <div className="cal-status">
+            <span className={`badge ${isOwner ? 'badge-owner' : canWrite ? 'badge-write' : 'badge-read'}`}>
+              {accessLabel}
+            </span>
+            <div className="presence-list" aria-label="Presence">
+              {viewers.slice(0, 5).map((v) => (
+                <span key={v.key} className="presence-avatar" title={`${v.name} (${v.access})`}>
+                  {initials(v.name)}
+                </span>
+              ))}
+              {viewers.length > 5 ? <span className="presence-more">+{viewers.length - 5}</span> : null}
+            </div>
           </div>
         </div>
       </div>
 
-      <MonthCalendar
+      {isOwner ? (
+        <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 8 }}>
+          <button type="button" className="btn-ghost" onClick={() => setManageOpen(true)}>
+            Manage codes
+          </button>
+        </div>
+      ) : null}
+
+      <div className="fade-stage delay-1">
+        <MonthCalendar
         anchor={anchor}
         events={monthEvents}
         onPrevMonth={() => setAnchor((d) => addMonths(d, -1))}
         onNextMonth={() => setAnchor((d) => addMonths(d, 1))}
         showAddHint={canWrite}
-        onAddEvent={() => setAddOpen(true)}
-      />
+        onEventClick={(ev) => setSelectedEvent(ev)}
+        />
+      </div>
 
-      {canWrite ? (
-        <button type="button" className="btn" style={{ marginBottom: 12 }} onClick={() => setAddOpen(true)}>
-          + Add event
-        </button>
-      ) : (
-        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 12 }}>
+      {canWrite ? null : (
+        <p className="meta-note" style={{ marginBottom: 16 }}>
           View only — adding events is disabled. Writes are also blocked at the database level for
           read access.
         </p>
       )}
 
+      {canWrite ? (
+        <button type="button" className="fab-add" onClick={() => setAddOpen(true)} aria-label="Add event">
+          +
+        </button>
+      ) : null}
+
       <AddEventPanel
         open={addOpen && canWrite}
         onClose={() => setAddOpen(false)}
+        initialCreatorName={creatorName}
+        onCreatorNameChange={setCreatorName}
         onSave={async (payload) => {
           if (!authClient || !calendarUuid) throw new Error('Not ready')
+          const normalizedName = payload.creator_name.trim() || creatorName.trim() || randomAnonymousName()
+          writeCreatorName(calendarId, normalizedName)
+          setCreatorName(normalizedName)
           const { error } = await authClient.from('events').insert({
             calendar_id: calendarUuid,
             title: payload.title,
@@ -359,9 +450,19 @@ export function CalendarPage() {
             start_time: payload.start_time,
             end_time: payload.end_time,
             note: payload.note,
+            creator_name: normalizedName,
           })
           if (error) throw new Error(error.message)
         }}
+      />
+
+      <EventDetailModal
+        open={!!selectedEvent}
+        event={selectedEvent}
+        canDelete={canWrite}
+        busy={deletingEvent}
+        onClose={() => setSelectedEvent(null)}
+        onDelete={(ev) => deleteEvent(ev)}
       />
 
       {sessionToken ? (
@@ -370,6 +471,8 @@ export function CalendarPage() {
           onClose={() => setManageOpen(false)}
           anon={anon}
           sessionToken={sessionToken}
+          initialOwner={createState?.ownerCode}
+          onDeleteCalendar={isOwner ? deleteCalendar : undefined}
         />
       ) : null}
     </div>

@@ -8,5 +8,6 @@ export type CalendarEvent = {
   start_time: string
   end_time: string | null
   note: string | null
+  creator_name: string | null
   created_at: string
 }

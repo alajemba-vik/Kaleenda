@@ -32,3 +32,20 @@ export function clearStoredSession(publicId: string) {
   localStorage.removeItem(tokenKey(publicId))
   localStorage.removeItem(accessKey(publicId))
 }
+
+export function creatorNameKey(publicId: string) {
+  return `cal_${publicId}_creator_name`
+}
+
+export function readCreatorName(publicId: string): string | null {
+  const v = localStorage.getItem(creatorNameKey(publicId))
+  const t = v?.trim() ?? ''
+  return t.length ? t : null
+}
+
+export function writeCreatorName(publicId: string, name: string): void {
+  const trimmed = name.trim()
+  if (!trimmed) return
+  localStorage.setItem(creatorNameKey(publicId), trimmed)
+}
+

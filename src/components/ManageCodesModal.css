@@ -1,21 +1,22 @@
 .mc-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(15, 23, 42, 0.24);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 48px 16px;
+  padding: 24px 16px;
   z-index: 40;
+  backdrop-filter: blur(7px);
 }
 
 .mc-panel {
   width: min(480px, 100%);
-  background: var(--surface);
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(245, 247, 251, 0.88));
   border-radius: var(--radius);
-  border: 0.5px solid var(--border);
-  padding: 16px 16px 18px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  padding: 20px;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.24);
 }
 
 .mc-head {
@@ -23,25 +24,51 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .mc-title {
-  font-size: 1rem;
+  font-size: 1.08rem;
   font-weight: 600;
   margin: 0;
 }
 
 .mc-x {
-  border: none;
-  background: transparent;
-  font-size: 1.4rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 8px;
+  font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
   color: var(--text-muted);
-  padding: 0 4px;
+  padding: 6px 8px;
 }
 
 .mc-x:hover {
   color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-2);
 }
+
+.mc-loading {
+  margin-bottom: 0;
+}
+
+.mc-code-box {
+  margin-bottom: 12px;
+}
+
+.mc-hint {
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+.mc-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.mc-danger:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+

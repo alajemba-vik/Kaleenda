@@ -1,27 +1,54 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import '../styles/ui.css'
 import './AddEventPanel.css'
 
 type Props = {
   open: boolean
   onClose: () => void
+  initialCreatorName?: string
+  onCreatorNameChange?: (name: string) => void
   onSave: (payload: {
     title: string
     event_date: string
     start_time: string
     end_time: string | null
     note: string | null
+    creator_name: string
   }) => Promise<void>
 }
 
-export function AddEventPanel({ open, onClose, onSave }: Props) {
+export function AddEventPanel({ open, onClose, initialCreatorName, onCreatorNameChange, onSave }: Props) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [rendered, setRendered] = useState(open)
+  const [closing, setClosing] = useState(false)
 
-  if (!open) return null
+  useEffect(() => {
+    if (open) {
+      setRendered(true)
+      setClosing(false)
+      return
+    }
+    if (!rendered) return
+    setClosing(true)
+    const t = window.setTimeout(() => {
+      setRendered(false)
+      setClosing(false)
+    }, 280)
+    return () => window.clearTimeout(t)
+  }, [open, rendered])
+
+  function requestClose() {
+    setClosing(true)
+    window.setTimeout(() => {
+      onClose()
+    }, 280)
+  }
+
+  if (!rendered) return null
 
   return (
-    <div className="add-panel-backdrop" aria-hidden={false} onClick={onClose}>
+    <div className={`add-panel-backdrop ${closing ? 'closing' : 'open'}`} aria-hidden={false} onClick={requestClose}>
       <div
         className="add-panel"
         role="dialog"
@@ -29,14 +56,15 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
         aria-labelledby="add-event-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="row" style={{ marginBottom: 8 }}>
-          <div id="add-event-title" className="add-panel-title" style={{ marginBottom: 0 }}>
+        <div className="add-panel-handle" aria-hidden="true" />
+        <div className="add-panel-head">
+          <div id="add-event-title" className="add-panel-title">
             Add event
           </div>
           <button
             type="button"
             className="btn-ghost"
-            onClick={onClose}
+            onClick={requestClose}
             disabled={busy}
             aria-label="Close add event dialog"
           >
@@ -56,6 +84,7 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
             const start_time = String(fd.get('start_time') ?? '')
             const end_raw = String(fd.get('end_time') ?? '').trim()
             const note_raw = String(fd.get('note') ?? '').trim()
+            const creator_raw = String(fd.get('creator_name') ?? '').trim()
 
             if (!title) {
               setErr('Title is required')
@@ -69,6 +98,7 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
                 start_time: start_time.length === 5 ? `${start_time}:00` : start_time,
                 end_time: end_raw ? (end_raw.length === 5 ? `${end_raw}:00` : end_raw) : null,
                 note: note_raw || null,
+                creator_name: creator_raw,
               })
               formEl.reset()
               onClose()
@@ -79,7 +109,7 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
             }
           }}
         >
-          <label className="sr-only" htmlFor="ev-title">
+          <label className="add-label" htmlFor="ev-title">
             Event title
           </label>
           <input
@@ -90,9 +120,21 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
             required
             disabled={busy}
           />
+          <label className="add-label" htmlFor="ev-creator">
+            Your name
+          </label>
+          <input
+            id="ev-creator"
+            name="creator_name"
+            className="field"
+            placeholder="What's your name? (optional)"
+            defaultValue={initialCreatorName ?? ''}
+            onChange={(e) => onCreatorNameChange?.(e.currentTarget.value)}
+            disabled={busy}
+          />
           <div className="add-panel-row">
             <div>
-              <label className="sr-only" htmlFor="ev-date">
+              <label className="add-label" htmlFor="ev-date">
                 Date
               </label>
               <input
@@ -105,7 +147,7 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
               />
             </div>
             <div>
-              <label className="sr-only" htmlFor="ev-start">
+              <label className="add-label" htmlFor="ev-start">
                 Start time
               </label>
               <input
@@ -118,7 +160,7 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
               />
             </div>
           </div>
-          <label className="sr-only" htmlFor="ev-end">
+          <label className="add-label" htmlFor="ev-end">
             End time
           </label>
           <input
@@ -129,7 +171,7 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
             placeholder="End time (optional)"
             disabled={busy}
           />
-          <label className="sr-only" htmlFor="ev-note">
+          <label className="add-label" htmlFor="ev-note">
             Note
           </label>
           <textarea
@@ -140,14 +182,14 @@ export function AddEventPanel({ open, onClose, onSave }: Props) {
             placeholder="Note (optional)"
             disabled={busy}
           />
-          <div className="row" style={{ marginTop: 4 }}>
+          <div className="row add-panel-actions">
             <button className="btn" type="submit" disabled={busy}>
               {busy ? 'Saving…' : 'Save event'}
             </button>
             <button
               type="button"
               className="btn-secondary btn"
-              onClick={() => onClose()}
+              onClick={requestClose}
               disabled={busy}
             >
               Cancel

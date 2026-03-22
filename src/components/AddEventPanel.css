@@ -2,47 +2,97 @@
   position: fixed;
   inset: 0;
   z-index: 60;
-  display: grid;
-  place-items: center;
-  padding: 16px;
-  background: rgba(16, 16, 18, 0.2);
-  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  transition: opacity var(--dur-modal) var(--ease-modal);
 }
 
 .add-panel {
-  width: min(560px, 100%);
-  max-height: min(88vh, 720px);
+  width: min(620px, 100%);
+  max-height: min(88vh, 760px);
   overflow: auto;
-  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.58));
-  border: 0.5px solid rgba(255, 255, 255, 0.45);
-  border-radius: 18px;
-  padding: 1rem 1.1rem;
-  box-shadow: 0 24px 70px rgba(10, 10, 12, 0.18);
-  backdrop-filter: blur(18px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(100%);
+  transition: transform var(--dur-modal) var(--ease-modal);
+}
+
+.add-panel-backdrop.open .add-panel {
+  transform: translateY(0);
+}
+
+.add-panel-backdrop.closing {
+  opacity: 0;
+}
+
+.add-panel-handle {
+  width: 46px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  margin: -8px auto var(--space-3);
+}
+
+.add-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
 }
 
 .add-panel-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--text);
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.add-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
 }
 
 .add-panel-form .field {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-1);
+  border-color: transparent;
 }
 
 .add-panel-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: var(--space-1);
 }
 
 .add-panel-row .field {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-1);
 }
 
 textarea.field {
   resize: vertical;
-  min-height: 72px;
+  min-height: 88px;
+  padding-top: 10px;
+  height: auto;
+}
+
+.add-panel-actions {
+  margin-top: var(--space-1);
+  display: grid;
+  width: 100%;
+}
+
+.add-panel-actions .btn,
+.add-panel-actions .btn-secondary {
+  width: 100%;
 }

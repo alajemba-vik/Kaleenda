@@ -1,5 +1,5 @@
 -- Group calendar: code-based access + RLS + Realtime
--- Run in Supabase SQL Editor or via CLI after creating project.
+-- Fresh consolidated initial schema with owner codes included from the start
 
 create extension if not exists pgcrypto;
 
@@ -36,8 +36,13 @@ create table public.calendars (
   read_code_hash text not null,
   write_code_plain text not null,
   read_code_plain text not null,
+  owner_code_hash text not null,
+  owner_code_plain text not null,
   created_at timestamptz not null default now()
 );
+
+create unique index calendars_owner_code_plain_idx on public.calendars(owner_code_plain);
+create unique index calendars_owner_code_hash_idx on public.calendars(owner_code_hash);
 
 create table public.calendar_sessions (
   id uuid primary key default gen_random_uuid(),
@@ -58,6 +63,7 @@ create table public.events (
   start_time time not null,
   end_time time,
   note text,
+  creator_name text not null default 'Anonymous',
   created_at timestamptz not null default now()
 );
 
@@ -88,6 +94,17 @@ create policy "calendars_select_own_session"
     )
   );
 
+create policy "calendars_delete_owner"
+  on public.calendars for delete
+  using (
+    exists (
+      select 1 from public.calendar_sessions s
+      where s.calendar_id = calendars.id
+        and s.token = public.jwt_session_token()
+        and s.access_level = 'owner'
+    )
+  );
+
 create policy "sessions_select_own"
   on public.calendar_sessions for select
   using (token = public.jwt_session_token());
@@ -113,6 +130,17 @@ create policy "events_insert_write"
     )
   );
 
+create policy "events_delete_write_owner"
+  on public.events for delete
+  using (
+    exists (
+      select 1 from public.calendar_sessions s
+      where s.calendar_id = events.calendar_id
+        and s.token = public.jwt_session_token()
+        and s.access_level in ('owner', 'write')
+    )
+  );
+
 -- RPCs (anon can call; logic is SECURITY DEFINER)
 
 create or replace function public.create_calendar(p_name text)
@@ -125,6 +153,7 @@ declare
   v_public_id text;
   v_write text;
   v_read text;
+  v_owner text;
   v_cal_id uuid;
   v_owner_token uuid;
 begin
@@ -135,6 +164,7 @@ begin
   v_public_id := public.random_code_segment(6);
   v_write := 'WR-' || public.random_code_segment(6);
   v_read := 'RD-' || public.random_code_segment(6);
+  v_owner := 'OW-' || public.random_code_segment(6);
 
   insert into public.calendars (
     public_id,
@@ -142,7 +172,9 @@ begin
     write_code_hash,
     read_code_hash,
     write_code_plain,
-    read_code_plain
+    read_code_plain,
+    owner_code_hash,
+    owner_code_plain
   )
   values (
     v_public_id,
@@ -150,7 +182,9 @@ begin
     public.hash_access_code(v_write),
     public.hash_access_code(v_read),
     v_write,
-    v_read
+    v_read,
+    public.hash_access_code(v_owner),
+    v_owner
   )
   returning id into v_cal_id;
 
@@ -163,6 +197,7 @@ begin
     'public_id', v_public_id,
     'write_code', v_write,
     'read_code', v_read,
+    'owner_code', v_owner,
     'owner_session_token', v_owner_token::text
   );
 end;
@@ -198,7 +233,9 @@ begin
   v_norm := trim(p_code);
   v_hash := public.hash_access_code(v_norm);
 
-  if v_hash = v_cal.write_code_hash then
+  if v_hash = v_cal.owner_code_hash then
+    v_level := 'owner';
+  elsif v_hash = v_cal.write_code_hash then
     v_level := 'write';
   elsif v_hash = v_cal.read_code_hash then
     v_level := 'read';
@@ -221,7 +258,6 @@ $$;
 
 grant execute on function public.join_calendar(text, text) to anon, authenticated;
 
--- Public metadata only (for code entry UI)
 create or replace function public.get_calendar_meta(p_public_id text)
 returns jsonb
 language plpgsql
@@ -280,7 +316,9 @@ begin
   set write_code_hash = public.hash_access_code(v_write),
       read_code_hash = public.hash_access_code(v_read),
       write_code_plain = v_write,
-      read_code_plain = v_read
+      read_code_plain = v_read,
+      owner_code_hash = c.owner_code_hash,
+      owner_code_plain = c.owner_code_plain
   where c.id = v_sess.calendar_id;
 
   return jsonb_build_object(
@@ -302,6 +340,7 @@ declare
   v_sess public.calendar_sessions%rowtype;
   v_write text;
   v_read text;
+  v_owner text;
 begin
   if p_session_token is null then
     raise exception 'Not allowed';
@@ -312,11 +351,15 @@ begin
     raise exception 'Not allowed';
   end if;
 
-  select c.write_code_plain, c.read_code_plain into v_write, v_read
+  select c.write_code_plain, c.read_code_plain, c.owner_code_plain into v_write, v_read, v_owner
   from public.calendars c
   where c.id = v_sess.calendar_id;
 
-  return jsonb_build_object('write_code', v_write, 'read_code', v_read);
+  return jsonb_build_object(
+    'write_code', v_write,
+    'read_code', v_read,
+    'owner_code', v_owner
+  );
 end;
 $$;
 
@@ -329,3 +372,4 @@ begin
 exception
   when duplicate_object then null;
 end $$;
+

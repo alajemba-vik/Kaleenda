@@ -27,7 +27,8 @@ export function JoinPage() {
 
   return (
     <div className="layout">
-      <div style={{ maxWidth: 480 }}>
+      <div className="surface-card" style={{ maxWidth: 560 }}>
+        <p className="kicker">Join</p>
         <h1 className="page-title">Join a calendar</h1>
         <p className="page-sub">
           Paste the share link from the owner, or enter the 6-character calendar ID.
@@ -48,7 +49,7 @@ export function JoinPage() {
             <button className="btn" type="submit">
               Continue
             </button>
-            <Link to="/" className="btn-secondary btn" style={{ textAlign: 'center' }}>
+            <Link to="/" className="btn-secondary btn">
               Back
             </Link>
           </div>
