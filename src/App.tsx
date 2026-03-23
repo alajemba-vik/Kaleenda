@@ -82,22 +82,24 @@ export default function App() {
     <div className="app-shell">
       <ScrollToTop />
       <SplashScreen />
-      <AppErrorBoundary>
-        <Suspense fallback={<div className="layout">Loading...</div>}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/create" element={<CreatePage />} />
-            <Route path="/join" element={<JoinPage />} />
-            <Route path="/cal/:calendarId" element={<CalendarPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/legal" element={<LegalPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </AppErrorBoundary>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <AppErrorBoundary>
+          <Suspense fallback={<div className="layout">Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/create" element={<CreatePage />} />
+              <Route path="/join" element={<JoinPage />} />
+              <Route path="/cal/:calendarId" element={<CalendarPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/legal" element={<LegalPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </AppErrorBoundary>
+      </div>
       <SiteFooter />
       <LocalStorageNotice />
     </div>

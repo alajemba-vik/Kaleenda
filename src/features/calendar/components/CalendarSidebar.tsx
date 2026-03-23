@@ -1,13 +1,33 @@
 import { CalendarTheme, CalendarEvent } from '@/types'
+import './CalendarSidebar.css'
 
 const themeOptions: Array<{ key: CalendarTheme; label: string; swatch: string }> = [
-  { key: 'default', label: 'Default', swatch: '#3d6fff' },
-  { key: 'dark', label: 'Dark', swatch: '#2c2c2a' },
-  { key: 'pastel', label: 'Pastel', swatch: '#d4537e' },
-  { key: 'sunset', label: 'Sunset', swatch: '#d85a30' },
-  { key: 'forest', label: 'Forest', swatch: '#1d9e75' },
+  { key: 'default',  label: 'Default',  swatch: '#3d6fff' },
+  { key: 'dark',     label: 'Dark',     swatch: '#1a1916' },
+  { key: 'pastel',   label: 'Pastel',   swatch: '#d4537e' },
+  { key: 'sunset',   label: 'Sunset',   swatch: '#d85a30' },
+  { key: 'forest',   label: 'Forest',   swatch: '#1d9e75' },
   { key: 'midnight', label: 'Midnight', swatch: '#1a2e42' },
 ]
+
+const moodIcon: Record<string, string> = {
+  chill:       '😌',
+  panic:       '😰',
+  celebration: '🎉',
+  onfire:      '🔥',
+  deadline:    '⏰',
+  urgent:      '⚡',
+  easy:        '✅',
+  vibes:       '✨',
+}
+
+function formatEventDate(raw: string): string {
+  try {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(raw + 'T00:00:00'))
+  } catch {
+    return raw
+  }
+}
 
 type Props = {
   calendarTheme: CalendarTheme
@@ -31,51 +51,70 @@ export function CalendarSidebar({
   onManageCodes,
 }: Props) {
   return (
-    <aside className="atelier-sidebar-card">
-      <div>
-        <h3 className="atelier-section-title">Personalization</h3>
-        <div className="atelier-theme-grid">
-          {themeOptions.slice(0, 4).map((t) => (
+    <div className="cs-panel atelier-sidebar-card">
+
+      {/* ── Upcoming events ── */}
+      <section className="cs-section">
+        <h3 className="cs-section-label">Upcoming events</h3>
+        <div className="cs-event-list">
+          {upcomingEvents.length === 0 ? (
+            <p className="cs-empty">Nothing scheduled yet.</p>
+          ) : (
+            upcomingEvents.map((ev) => (
+              <div key={ev.id} className="cs-event-card">
+                <span className="cs-event-icon" aria-hidden="true">
+                  {moodIcon[ev.mood ?? ''] ?? '📅'}
+                </span>
+                <div className="cs-event-info">
+                  <span className="cs-event-name">{ev.title}</span>
+                  <span className="cs-event-date">{formatEventDate(ev.event_date)}</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* ── Themes ── */}
+      <section className="cs-section">
+        <h3 className="cs-section-label">Personalization</h3>
+        <div className="cs-theme-grid">
+          {themeOptions.map((t) => (
             <button
               key={t.key}
               type="button"
-              className={`atelier-theme-chip ${calendarTheme === t.key ? 'active' : ''}`}
+              className={`cs-theme-btn ${calendarTheme === t.key ? 'cs-theme-active' : ''}`}
               disabled={!canPickTheme}
-              onClick={() => (canPickTheme ? void updateTheme(t.key) : undefined)}
+              onClick={() => canPickTheme && void updateTheme(t.key)}
+              title={t.label}
             >
-              <span className="atelier-chip-swatch" style={{ background: t.swatch }} aria-hidden="true" />
-              {t.label}
+              <span
+                className="cs-theme-swatch"
+                style={{ background: t.swatch }}
+                aria-hidden="true"
+              />
+              <span className="cs-theme-label">{t.label}</span>
             </button>
           ))}
         </div>
-      </div>
+        {!canPickTheme && (
+          <p className="cs-tip">Write access needed to change themes.</p>
+        )}
+      </section>
 
-      <div className="atelier-upcoming-block">
-        <h3 className="atelier-section-title">Upcoming</h3>
-        <ul className="atelier-upcoming-list">
-          {upcomingEvents.length === 0 ? (
-            <li className="atelier-upcoming-empty">No events this month yet.</li>
-          ) : (
-            upcomingEvents.map((ev) => (
-              <li key={ev.id} className="atelier-upcoming-item">
-                <span className="atelier-upcoming-title">{ev.title}</span>
-                <span className="atelier-upcoming-date">{ev.event_date}</span>
-              </li>
-            ))
-          )}
-        </ul>
-      </div>
-
-      <div className="atelier-side-actions">
+      {/* ── Access + manage ── */}
+      <section className="cs-section cs-section-bottom">
+        <h3 className="cs-section-label">Your access</h3>
         <span className={`badge ${isOwner ? 'badge-owner' : canWrite ? 'badge-write' : 'badge-read'}`}>
-          {accessLabel}
+          {isOwner ? '★ Owner' : canWrite ? '✏ Write' : '👁 View only'}
         </span>
-        {isOwner ? (
-          <button type="button" className="btn-ghost" onClick={onManageCodes}>
+        {isOwner && (
+          <button type="button" className="cs-manage-btn" onClick={onManageCodes}>
             Manage codes
           </button>
-        ) : null}
-      </div>
-    </aside>
+        )}
+      </section>
+
+    </div>
   )
 }

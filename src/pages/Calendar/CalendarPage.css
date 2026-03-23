@@ -1,241 +1,441 @@
-.atelier-cal {
-  max-width: 1280px;
-  padding-top: 28px;
+/* ============================================================
+   KALEENDA CALENDAR PAGE — full redesign
+   ============================================================ */
+
+/* Hide global SiteFooter on the calendar page */
+body.on-calendar-page .mp-footer {
+  display: none;
 }
 
-.atelier-cal-header {
+/* Also hide when add-event modal is open */
+body.add-event-modal-open .mp-footer {
+  display: none;
+}
+
+/* ---- Page base ---- */
+.kaleenda-page {
+  min-height: 100dvh;
+  background: var(--bg);
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 20px;
-  margin-bottom: 22px;
+  flex-direction: column;
+  position: relative;
 }
 
-.cal-home-row {
-  margin-bottom: 8px;
+/* Subtle ambient gradient blob */
+.kaleenda-page::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(61,111,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.cal-app-logo {
-  display: inline-block;
-  font-family: 'Instrument Serif', serif;
-  font-style: italic;
-  font-size: 28px;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: #1a1916;
-  text-decoration: none;
-}
-
-.cal-app-logo:hover {
-  opacity: 0.86;
-}
-
-.atelier-cal-title {
-  margin: 0;
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(40px, 7vw, 64px);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-}
-
-.atelier-cal-month {
-  margin: 4px 0 0;
-  font-family: 'Instrument Serif', serif;
-  font-style: italic;
-  color: rgba(61, 111, 255, 0.7);
-  font-size: 24px;
-}
-
-.atelier-header-right {
-  display: grid;
-  justify-items: end;
-  gap: 12px;
-}
-
-.atelier-presence-pill {
+/* ---- Top nav ---- */
+.kp-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  z-index: 100;
+  background: rgba(245, 240, 232, 0.82);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-bottom: 0.5px solid rgba(0,0,0,0.07);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--surface-2);
+  justify-content: space-between;
+  padding: 0 28px;
+  gap: 16px;
 }
 
-.atelier-presence-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: rgba(61, 111, 255, 0.7);
+.kp-nav-logo {
+  font-family: var(--logo-font);
+  font-style: italic;
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
 }
 
-.atelier-header-actions {
+.kp-nav-logo:hover { opacity: 0.65; text-decoration: none; }
+
+.kp-nav-center {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
 }
 
-.atelier-share-btn {
-  border: 0.5px solid rgba(0, 0, 0, 0.1);
-  border-radius: 99px;
-  background: #f5f0e8;
-  color: #1a1916;
-  padding: 6px 16px;
+.kp-nav-link {
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  transition: color 0.12s, background 0.12s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
 }
 
-.atelier-share-btn:hover {
-  background: #ede8df;
-}
-
-.atelier-share-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.atelier-workspace {
-  display: grid;
-  grid-template-columns: minmax(220px, 300px) 1fr;
-  gap: 18px;
-  align-items: start;
-}
-
-.atelier-sidebar-card {
-  border-radius: 16px;
-  background: #f5f4ed;
-  padding: 18px;
-  display: grid;
-  gap: 18px;
-}
-
-.atelier-section-title {
-  margin: 0 0 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(49, 51, 44, 0.55);
-}
-
-.atelier-theme-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.atelier-theme-chip {
-  border: 0;
-  border-radius: 16px;
-  background: #fff;
-  color: #31332c;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 8px 10px;
+.kp-nav-right {
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-}
-
-.atelier-theme-chip.active {
-  box-shadow: inset 0 0 0 1.5px rgba(61, 111, 255, 0.3);
-}
-
-.atelier-theme-chip:disabled {
-  opacity: 0.72;
-  cursor: not-allowed;
-}
-
-.atelier-chip-swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
   flex-shrink: 0;
 }
 
-.atelier-upcoming-block {
-  padding-top: 12px;
-  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+.kp-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background 0.12s, color 0.12s;
 }
 
-.atelier-upcoming-list {
-  margin: 0;
+.kp-icon-btn:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--text-primary);
+}
+
+.kp-nav-create-btn {
+  background: var(--text-primary);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: opacity 0.12s, transform 0.12s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.kp-nav-create-btn:hover { opacity: 0.82; text-decoration: none; }
+.kp-nav-create-btn:active { transform: scale(0.96); }
+
+/* ---- Sidebar ---- */
+.kp-sidebar {
+  position: fixed;
+  left: 0;
+  top: 60px;          /* sit below nav */
+  bottom: 0;
+  width: 280px;
+  background: rgba(248, 245, 239, 0.98);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border-right: 0.5px solid rgba(0,0,0,0.08);
+  z-index: 90;
+  padding: 24px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transform: translateX(-100%);
+  transition: transform 340ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 340ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  box-shadow: none;
+}
+
+.kp-sidebar-open .kp-sidebar {
+  transform: translateX(0);
+  box-shadow: 4px 0 32px rgba(0,0,0,0.08);
+}
+
+.kp-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.kp-sidebar-title {
+  font-family: var(--logo-font);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.kp-sidebar-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.12s, color 0.12s, transform 0.2s;
+}
+
+.kp-sidebar-close:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+/* Existing CalendarSidebar inside the new wrapper */
+.kp-sidebar .atelier-sidebar-card {
+  background: transparent;
   padding: 0;
-  list-style: none;
-  display: grid;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ---- Main content ---- */
+.kp-main {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  padding-top: calc(60px + 36px);
+  padding-bottom: 64px;
+  padding-left: 40px;
+  padding-right: 40px;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  transition: padding-left 340ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kp-sidebar-open .kp-main {
+  padding-left: calc(280px + 40px);
+}
+
+/* ---- Page header ---- */
+.kp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+  animation: kp-fade-up 0.5s var(--ease-standard) both;
+}
+
+@keyframes kp-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.kp-cal-name {
+  font-family: var(--logo-font);
+  font-style: italic;
+  font-size: clamp(40px, 5.5vw, 68px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.04;
+  margin: 0 0 4px;
+}
+
+.kp-cal-month {
+  font-family: var(--logo-font);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--text-tertiary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.kp-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
 }
 
-.atelier-upcoming-item {
-  border-radius: 16px;
-  background: #fff;
-  padding: 8px 10px;
+/* ── Presence pill ── */
+.kp-presence-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.7);
+  border: 0.5px solid rgba(255,255,255,0.95);
+  border-radius: 99px;
+  padding: 6px 14px 6px 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04);
+  transition: box-shadow 0.15s;
 }
 
-.atelier-upcoming-title {
-  display: block;
-  font-size: 12px;
+.kp-presence-pill:hover {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1), 0 0 0 0.5px rgba(0,0,0,0.06);
+}
+
+.kp-presence-label {
+  font-size: 9px;
   font-weight: 700;
-  color: #31332c;
-}
-
-.atelier-upcoming-date {
-  display: block;
-  margin-top: 2px;
-  font-size: 10px;
-  color: #6b6860;
-}
-
-.atelier-upcoming-empty {
-  font-size: 12px;
-  color: #6b6860;
-}
-
-.atelier-side-actions {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #10b981;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
+}
+
+.kp-presence-label::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: kp-pulse 2s ease-in-out infinite;
+}
+
+@keyframes kp-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ── Header actions ── */
+.kp-header-actions {
+  display: flex;
   gap: 8px;
+  align-items: center;
 }
 
-.presence-avatar {
-  position: relative;
-  overflow: visible;
+.kp-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 0.5px solid rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.7);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.12s, box-shadow 0.12s;
+  font-family: var(--font);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
-.presence-dot {
+.kp-header-btn:hover {
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.kp-header-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ---- Calendar card ---- */
+.kp-grid-card {
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow:
+    0 1px 1px rgba(0,0,0,0.02),
+    0 4px 16px rgba(49,51,44,0.06),
+    0 20px 60px rgba(49,51,44,0.07),
+    0 0 0 0.5px rgba(0,0,0,0.05);
+  overflow: hidden;
+  animation: kp-fade-up 0.5s 0.08s var(--ease-standard) both;
+}
+
+/* ---- Floating add button ---- */
+.kp-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  color: white;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 80;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.2),
+    0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.22s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kp-fab:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.kp-fab:active { transform: scale(0.94); }
+
+/* Tooltip */
+.kp-fab::after {
+  content: 'Add event';
   position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  border: 1.5px solid #f5f4ed;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--text-primary);
+  color: white;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
 }
 
-.presence-dot.online {
-  background: #22c55e;
-}
+.kp-fab:hover::after { opacity: 1; }
 
-.presence-dot.away {
-  background: #b1b3a9;
-}
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .kp-main {
+    padding: calc(60px + 24px) 16px 48px;
+  }
 
-@media (max-width: 980px) {
-  .atelier-cal-header {
+  .kp-sidebar-open .kp-main {
+    padding-left: 16px;
+  }
+
+  .kp-nav {
+    padding: 0 16px;
+  }
+
+  .kp-nav-center { display: none; }
+
+  .kp-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .atelier-header-right {
-    width: 100%;
-    justify-items: start;
-  }
-
-  .atelier-workspace {
-    grid-template-columns: 1fr;
+  .kp-header-right {
+    align-items: flex-start;
   }
 }
-

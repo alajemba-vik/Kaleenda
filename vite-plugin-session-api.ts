@@ -9,6 +9,7 @@ type SessionApiEnv = {
   SUPABASE_SERVICE_ROLE_KEY?: string
   VITE_CONTACT_EMAIL?: string
   RESEND_API_KEY?: string
+  RESEND_FROM_EMAIL?: string
 }
 
 function readBody(req: Connect.IncomingMessage): Promise<string> {
@@ -31,6 +32,8 @@ async function handleContactApi(
     env.VITE_CONTACT_EMAIL ?? process.env.VITE_CONTACT_EMAIL ?? process.env.CONTACT_EMAIL
   const resendKey =
     env.RESEND_API_KEY ?? process.env.RESEND_API_KEY
+  const fromEmail =
+    env.RESEND_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? 'Kaleenda <onboarding@resend.dev>'
 
   if (!contactEmail) {
     res.statusCode = 500
@@ -71,7 +74,7 @@ async function handleContactApi(
       Authorization: `Bearer ${resendKey}`,
     },
     body: JSON.stringify({
-      from: 'Kaleenda Contact <onboarding@resend.dev>',
+      from: fromEmail,
       to: [contactEmail],
       reply_to: email,
       subject: `New message from ${name} via Kaleenda`,

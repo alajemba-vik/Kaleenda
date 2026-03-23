@@ -1,50 +1,49 @@
-const rows = [
-  { feature: 'Requires an account', others: '✕ Everyone needs one', kaleenda: '✓ Nobody does', isOtherBad: true },
-  { feature: 'Share with a link', others: 'Sometimes', kaleenda: '✓ Always', isOtherBad: false },
-  { feature: 'Setup & management', others: '✕ Complex, needs IT', kaleenda: '✓ Share one code. Done.', isOtherBad: true },
-  { feature: 'Temporary groups', others: '✕ Designed for teams', kaleenda: '✓ Built for this', isOtherBad: true },
-  { feature: 'Fun to use', others: '✕', kaleenda: '✓ Plushies', isOtherBad: true },
+import './ComparisonSection.css'
+
+type Row = {
+  feature: string
+  kaleenda: string
+  others: string
+}
+
+const rows: Row[] = [
+  { feature: 'Requires an account?', kaleenda: 'Never', others: 'Always' },
+  { feature: 'Share with a link',    kaleenda: 'Always', others: 'Sometimes' },
+  { feature: 'Setup & management',   kaleenda: 'Share one code. Done.', others: 'Complex, needs IT' },
+  { feature: 'Built for groups',     kaleenda: 'Yes — this is why we exist', others: 'Not really' },
+  { feature: 'Fun to use?',          kaleenda: 'Yes (plushies!)', others: 'Practical but dull' },
 ]
 
 export function ComparisonSection() {
   return (
-    <section style={{ background: 'var(--surface)', padding: '80px 24px' }}>
-      <div style={{ maxWidth: 960, margin: '0 auto' }}>
-        <h2 style={{ fontSize: 28, fontWeight: 500, letterSpacing: '-0.02em', textAlign: 'center', color: 'var(--text-primary)', margin: '0 0 16px' }}>
-          Built for groups, not corporations.
+    <section className="cs-shell">
+      <div className="cs-inner">
+        <h2 className="cs-title">
+          Built for groups, <em>not corporations.</em>
         </h2>
-        <p style={{ fontSize: 15, color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 480, margin: '0 auto 48px', lineHeight: 1.6 }}>
-          Other shared calendars require everyone to have an account. Kaleenda doesn't.
+        <p className="cs-sub">
+          Other shared calendars require everyone to have an account.<br />
+          Kaleenda doesn't. Never will.
         </p>
 
-        <div className="comparison-table-wrap">
-          <table className="comparison-table" aria-label="Kaleenda comparison table">
-            <thead>
-              <tr>
-                <th className="comparison-feature-head">Feature</th>
-                <th className="comparison-other-head">Other calendars</th>
-                <th className="comparison-kaleenda-head">Kaleenda</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.feature}>
-                  <td className="comparison-feature-cell">{row.feature}</td>
-                  <td
-                    className={`comparison-other-cell ${row.isOtherBad ? 'comparison-other-bad' : ''}`}
-                  >
-                    {row.others}
-                  </td>
-                  <td className="comparison-kaleenda-cell">
-                    <span className="comparison-kaleenda-value">{row.kaleenda}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="cs-card">
+          {/* Column headers */}
+          <div className="cs-row cs-head-row">
+            <div className="cs-col-feature cs-col-label">FEATURE</div>
+            <div className="cs-col-kaleenda cs-col-label cs-label-blue">KALEENDA</div>
+            <div className="cs-col-others cs-col-label">THE OTHERS</div>
+          </div>
+
+          {/* Data rows */}
+          {rows.map((row, i) => (
+            <div key={i} className="cs-row cs-data-row">
+              <div className="cs-col-feature cs-feature-text">{row.feature}</div>
+              <div className="cs-col-kaleenda cs-kaleenda-text">{row.kaleenda}</div>
+              <div className="cs-col-others cs-others-text">{row.others}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   )
 }
-

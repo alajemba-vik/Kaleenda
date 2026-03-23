@@ -1,10 +1,9 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useCalendarSession } from '@/features/calendar'
 import { useCalendarSync } from '@/features/calendar'
 import { AddEventPanel } from '@/features/calendar'
-import { CalendarHeader } from '@/features/calendar'
 import { CalendarSidebar } from '@/features/calendar'
 import { CodeEntry } from '@/features/calendar'
 import { EventDetailModal } from '@/features/calendar'
@@ -14,6 +13,7 @@ import { filterEventsForMonth, MonthCalendar } from '@/features/calendar'
 import { WelcomeCodes } from '@/features/calendar'
 import { addMonths } from '@/features/calendar'
 import { randomAnonymousName } from '@/lib/anonymousName'
+import { initials } from '@/lib/utils'
 import { usePwaPrompt } from '@/lib/usePwaPrompt'
 import { clearStoredSession, writeCreatorName, writeStoredSession } from '@/lib/storage'
 import type { AccessLevel, CalendarEvent, CalendarTheme } from '@/types'
@@ -88,6 +88,13 @@ export function CalendarPage() {
     setCalendarTheme
   )
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Hide global SiteFooter on the calendar page
+  useEffect(() => {
+    document.body.classList.add('on-calendar-page')
+    return () => document.body.classList.remove('on-calendar-page')
+  }, [])
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [deletingEvent, setDeletingEvent] = useState(false)
   const [anchor, setAnchor] = useState(() => new Date())
@@ -217,6 +224,7 @@ export function CalendarPage() {
     }
   }
 
+  /* ── Early-exit phases ───────────────────────────────────────── */
   if (phase === 'boot' || phase === 'welcome') {
     return (
       <div className="layout">
@@ -250,9 +258,7 @@ export function CalendarPage() {
           <p className="kicker">Not Found</p>
           <h1 className="page-title">Calendar not found</h1>
           <p className="page-sub">This link may be wrong, expired, or the calendar was removed.</p>
-          <Link className="btn" to="/">
-            Go home
-          </Link>
+          <Link className="btn" to="/">Go home</Link>
         </div>
       </div>
     )
@@ -262,9 +268,7 @@ export function CalendarPage() {
     return (
       <div className="layout">
         <div className="row top-nav">
-          <Link to="/" className="link-btn">
-            ← Home
-          </Link>
+          <Link to="/" className="link-btn">← Home</Link>
         </div>
         <CodeEntry
           calendarName={metaName ?? 'this calendar'}
@@ -278,20 +282,36 @@ export function CalendarPage() {
     )
   }
 
+  /* ── Main calendar view ──────────────────────────────────────── */
   return (
-    <div className="layout calendar-theme-root atelier-cal" data-theme={calendarTheme}>
-      <CalendarHeader
-        metaName={metaName}
-        monthLabel={monthLabel}
-        viewers={viewers}
-        canPickTheme={canPickTheme}
-        calendarTheme={calendarTheme}
-        updateTheme={updateTheme}
-        onShare={downloadMonthShareCard}
-        shareBusy={shareBusy}
-      />
+    <div className={`kaleenda-page calendar-theme-root${sidebarOpen ? ' kp-sidebar-open' : ''}`} data-theme={calendarTheme}>
 
-      <div className="atelier-workspace fade-stage delay-1">
+      {/* ── NAV ── */}
+      <nav className="kp-nav">
+        <Link to="/" className="kp-nav-logo">Kaleenda</Link>
+
+        <div className="kp-nav-center">
+          <span className="kp-nav-link">{metaName ?? 'Calendar'}</span>
+        </div>
+
+        <div className="kp-nav-right">
+          <button
+            type="button"
+            className="kp-icon-btn"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label={sidebarOpen ? 'Close panel' : 'Open panel'}
+            title={sidebarOpen ? 'Close panel' : 'Open panel'}
+          >
+            {sidebarOpen ? '✕' : '☰'}
+          </button>
+          <Link to="/create" className="kp-nav-create-btn">
+            + New calendar
+          </Link>
+        </div>
+      </nav>
+
+      {/* ── SIDEBAR ── */}
+      <div className="kp-sidebar">
         <CalendarSidebar
           calendarTheme={calendarTheme}
           canPickTheme={canPickTheme}
@@ -302,8 +322,53 @@ export function CalendarPage() {
           updateTheme={updateTheme}
           onManageCodes={() => setManageOpen(true)}
         />
+      </div>
 
-        <section>
+      {/* ── MAIN ── */}
+      <main className="kp-main">
+
+        {/* Page header */}
+        <header className="kp-header">
+          <div>
+            <h1 className="kp-cal-name">{metaName ?? 'Calendar'}</h1>
+            <p className="kp-cal-month">{monthLabel}</p>
+          </div>
+
+          <div className="kp-header-right">
+            {/* Presence pill */}
+            <div className="kp-presence-pill" aria-label="Live presence">
+              <span className="kp-presence-label">Live</span>
+              <div className="presence-list" aria-label="Presence">
+                {viewers.slice(0, 5).map((v, idx) => (
+                  <span
+                    key={v.key}
+                    className="presence-avatar"
+                    title={`${v.name} (${v.access})`}
+                  >
+                    {initials(v.name)}
+                    <span className={`presence-dot ${idx < 3 ? 'online' : 'away'}`} aria-hidden="true" />
+                  </span>
+                ))}
+                {viewers.length > 5 ? <span className="presence-more">+{viewers.length - 5}</span> : null}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="kp-header-actions">
+              <button
+                type="button"
+                className="kp-header-btn"
+                onClick={downloadMonthShareCard}
+                disabled={shareBusy}
+              >
+                ↗ {shareBusy ? 'Generating…' : 'Share'}
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Calendar in a white card */}
+        <div className="kp-grid-card">
           <MonthCalendar
             anchor={anchor}
             events={monthEvents}
@@ -312,23 +377,30 @@ export function CalendarPage() {
             showAddHint={canWrite}
             onEventClick={(ev) => setSelectedEvent(ev)}
           />
-        </section>
-      </div>
-
-      {canWrite ? null : (
-        <div style={{ padding: '0 16px' }}>
-          <p className="meta-note" style={{ marginBottom: 16 }}>
-            View only — adding events is disabled. Writes are blocked.
-          </p>
         </div>
-      )}
 
-      {canWrite ? (
-        <button type="button" className="fab-add" onClick={() => setAddOpen(true)} aria-label="Add event">
+        {!canWrite && (
+          <p className="meta-note" style={{ marginTop: 16 }}>
+            View only — adding events is disabled.
+          </p>
+        )}
+      </main>
+
+      {/* ── FAB ── */}
+      {canWrite && (
+        <button
+          type="button"
+          className="kp-fab"
+          onClick={() => setAddOpen(true)}
+          aria-label="Add event"
+        >
           +
         </button>
-      ) : null}
+      )}
 
+      {/* No footer here — global SiteFooter is hidden on this page via body class */}
+
+      {/* ── MODALS (all unchanged) ── */}
       <AddEventPanel
         open={addOpen && canWrite}
         onClose={() => setAddOpen(false)}
@@ -340,19 +412,18 @@ export function CalendarPage() {
           writeCreatorName(calendarId, normalizedName)
           setCreatorName(normalizedName)
           const { data, error } = await authClient.from('events').insert({
-             calendar_id: calendarUuid,
-             title: payload.title,
-             mood: payload.mood,
-             event_date: payload.event_date,
-             start_time: payload.start_time,
-             end_time: payload.end_time,
-             note: payload.note,
-             creator_name: normalizedName,
+            calendar_id: calendarUuid,
+            title: payload.title,
+            mood: payload.mood,
+            event_date: payload.event_date,
+            start_time: payload.start_time,
+            end_time: payload.end_time,
+            note: payload.note,
+            creator_name: normalizedName,
           }).select('*').single()
-           if (error) throw new Error(error.message)
+          if (error) throw new Error(error.message)
           if (data) {
             setEvents((prev) => mergeById(prev, data as CalendarEvent))
-            // Trigger PWA prompt after first event is added
             if (!firstEventAdded) {
               setFirstEventAdded(true)
               triggerPrompt()
@@ -381,6 +452,7 @@ export function CalendarPage() {
         />
       ) : null}
 
+      {/* Share card (hidden, used for image export) */}
       <div className="share-card-host" aria-hidden="true">
         <div ref={shareCardRef} className="share-month-card capture-freeze">
           <div className="share-month-title">{metaName ?? 'Calendar'}</div>

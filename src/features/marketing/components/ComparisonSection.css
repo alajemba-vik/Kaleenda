@@ -1,0 +1,137 @@
+/* ── Shell ────────────────────────────────────────────────────────── */
+.cs-shell {
+  background: var(--bg);
+  padding: 96px 24px;
+}
+
+.cs-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ── Title — matches image: large centered serif with italic emphasis ─ */
+.cs-title {
+  font-family: var(--logo-font); /* Instrument Serif */
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 0 0 20px;
+}
+
+.cs-title em {
+  font-style: italic;
+}
+
+.cs-sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 56px;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────── */
+.cs-card {
+  background: var(--surface-2);
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Row layout ───────────────────────────────────────────────────── */
+/* Column proportions: Feature (wide) | KALEENDA | THE OTHERS */
+.cs-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.cs-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Header row ───────────────────────────────────────────────────── */
+.cs-head-row {
+  background: var(--surface-2);
+}
+
+.cs-col-label {
+  padding: 14px 24px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.cs-label-blue {
+  color: var(--accent);
+}
+
+/* ── Data rows ────────────────────────────────────────────────────── */
+.cs-data-row {
+  background: var(--surface);
+  transition: background 0.12s ease;
+}
+
+.cs-data-row:hover {
+  background: #f9f8f5;
+}
+
+.cs-col-feature,
+.cs-col-kaleenda,
+.cs-col-others {
+  padding: 20px 24px;
+}
+
+/* Feature: bold, dark */
+.cs-feature-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Kaleenda: accent blue */
+.cs-kaleenda-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+/* Others: muted grey */
+.cs-others-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .cs-shell {
+    padding: 64px 16px;
+  }
+
+  .cs-row {
+    grid-template-columns: 1.2fr 1fr 1fr;
+  }
+
+  .cs-col-feature,
+  .cs-col-kaleenda,
+  .cs-col-others,
+  .cs-col-label {
+    padding: 16px 14px;
+  }
+
+  .cs-feature-text,
+  .cs-kaleenda-text,
+  .cs-others-text {
+    font-size: 12px;
+  }
+}
