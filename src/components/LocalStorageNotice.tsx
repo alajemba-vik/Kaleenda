@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import '../styles/ui.css'
+import '@/styles/ui.css'
 
 const COOKIE_NAME = 'kaleenda_storage_notice'
 

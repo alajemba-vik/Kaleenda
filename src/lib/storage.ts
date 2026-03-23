@@ -1,4 +1,4 @@
-import type { AccessLevel } from './types'
+import type { AccessLevel } from '@/types/index'
 
 export function tokenKey(publicId: string) {
   return `cal_${publicId}_token`

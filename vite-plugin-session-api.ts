@@ -7,6 +7,8 @@ type SessionApiEnv = {
   SUPABASE_URL?: string
   VITE_SUPABASE_URL?: string
   SUPABASE_SERVICE_ROLE_KEY?: string
+  VITE_CONTACT_EMAIL?: string
+  RESEND_API_KEY?: string
 }
 
 function readBody(req: Connect.IncomingMessage): Promise<string> {
@@ -18,11 +20,87 @@ function readBody(req: Connect.IncomingMessage): Promise<string> {
   })
 }
 
+async function handleContactApi(
+  req: Connect.IncomingMessage,
+  res: import('http').ServerResponse,
+  env: SessionApiEnv,
+) {
+  res.setHeader('Content-Type', 'application/json')
+
+  const contactEmail =
+    env.VITE_CONTACT_EMAIL ?? process.env.VITE_CONTACT_EMAIL ?? process.env.CONTACT_EMAIL
+  const resendKey =
+    env.RESEND_API_KEY ?? process.env.RESEND_API_KEY
+
+  if (!contactEmail) {
+    res.statusCode = 500
+    res.end(JSON.stringify({ error: 'Contact email not configured. Set VITE_CONTACT_EMAIL in .env' }))
+    return
+  }
+
+  let body: { name?: string; email?: string; message?: string }
+  try {
+    body = JSON.parse(await readBody(req)) as typeof body
+  } catch {
+    res.statusCode = 400
+    res.end(JSON.stringify({ error: 'Invalid JSON' }))
+    return
+  }
+
+  const { name = 'Anonymous', email = 'no-reply@kaleenda.app', message } = body
+  if (!message?.trim()) {
+    res.statusCode = 400
+    res.end(JSON.stringify({ error: 'Message is required' }))
+    return
+  }
+
+  if (!resendKey) {
+    // Dev fallback: just log
+    console.info('[contact] Email would send to:', contactEmail)
+    console.info('[contact] From:', name, email)
+    console.info('[contact] Message:', message)
+    res.statusCode = 200
+    res.end(JSON.stringify({ ok: true, note: 'Logged in dev (no RESEND_API_KEY set)' }))
+    return
+  }
+
+  const emailRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${resendKey}`,
+    },
+    body: JSON.stringify({
+      from: 'Kaleenda Contact <onboarding@resend.dev>',
+      to: [contactEmail],
+      reply_to: email,
+      subject: `New message from ${name} via Kaleenda`,
+      text: `From: ${name} <${email}>\n\n${message}`,
+    }),
+  })
+
+  if (!emailRes.ok) {
+    const errBody = await emailRes.json().catch(() => ({}))
+    res.statusCode = 502
+    res.end(JSON.stringify({ error: 'Email send failed', detail: errBody }))
+    return
+  }
+
+  res.statusCode = 200
+  res.end(JSON.stringify({ ok: true }))
+}
+
 export function sessionApiPlugin(env: SessionApiEnv = {}): import('vite').Plugin {
   return {
     name: 'session-api',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
+        // Contact email endpoint
+        if (req.url === '/api/contact' && req.method === 'POST') {
+          await handleContactApi(req, res, env)
+          return
+        }
+
         if (req.url !== '/api/auth/session' || req.method !== 'POST') {
           next()
           return
