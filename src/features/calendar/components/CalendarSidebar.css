@@ -26,71 +26,102 @@
   margin: 0 0 12px;
 }
 
-/* ── Event cards ── */
-.cs-event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* ── Event cards (Glassy) ── */
+.cs-events-glass-section {
+  padding: 20px 0;
+  border-bottom: 0.5px solid rgba(0,0,0,0.07);
 }
 
-.cs-event-card {
+.cs-events-glass-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 16px;
+}
+
+.cs-events-glass-container {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 16px;
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.cs-events-glass-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cs-event-glass-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--surface);
-  border: 0.5px solid var(--border);
-  border-radius: 14px;
-  padding: 10px 12px;
-  transition: box-shadow 0.12s, border-color 0.12s;
+  cursor: pointer;
 }
 
-.cs-event-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+.cs-event-glass-card:hover .cs-event-glass-title {
+  color: var(--accent);
 }
 
-.cs-event-icon {
-  font-size: 20px;
+.cs-event-glass-icon-box {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: var(--surface-2);
+  border-radius: 12px;
+  background: rgba(var(--accent-rgb, 61, 111, 255), 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
   flex-shrink: 0;
+}
+
+.cs-event-glass-emoji {
+  font-size: 16px;
   line-height: 1;
 }
 
-.cs-event-info {
+.cs-event-glass-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
 }
 
-.cs-event-name {
-  font-size: 12px;
-  font-weight: 600;
+.cs-event-glass-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
+  transition: color 0.15s ease;
 }
 
-.cs-event-date {
-  font-size: 11px;
+.cs-event-glass-date {
+  font-size: 9px;
   color: var(--text-tertiary);
   font-family: var(--logo-font);
   font-style: italic;
+  display: block;
+  margin-top: 1px;
 }
 
-.cs-empty {
-  font-size: 12px;
+.cs-events-empty {
+  font-size: 11px;
   color: var(--text-tertiary);
   font-style: italic;
   margin: 0;
-  padding: 8px 0;
 }
 
 /* ── Theme grid ── */

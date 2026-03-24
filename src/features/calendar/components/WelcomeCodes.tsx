@@ -291,6 +291,44 @@ export function WelcomeCodes({
         </p>
       ) : null}
 
+      {/* iCal subscribe */}
+      <div className="welcome-ical-section">
+        <p className="welcome-ical-label">Sync to Google / Apple / Outlook</p>
+        <div className="welcome-ical-row">
+          <a
+            href={`https://calendar.google.com/calendar/r?cid=webcal://${window.location.host}/api/cal/${calendarId}.ics`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-secondary welcome-ical-btn"
+            aria-label="Subscribe in Google Calendar"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="#4285F4">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" opacity="0" />
+              <path d="M16 11h-3V8c0-.55-.45-1-1-1s-1 .45-1 1v3H8c-.55 0-1 .45-1 1s.45 1 1 1h3v3c0 .55.45 1 1 1s1-.45 1-1v-3h3c.55 0 1-.45 1-1s-.45-1-1-1z"/>
+            </svg>
+            Google Calendar
+          </a>
+          <a
+            href={`webcal://${window.location.host}/api/cal/${calendarId}.ics`}
+            className="btn btn-secondary welcome-ical-btn"
+            aria-label="Subscribe to Apple Calendar"
+          >
+            🍏 Apple / webcal
+          </a>
+          <button
+            type="button"
+            className="btn btn-secondary welcome-ical-btn"
+            onClick={() => void copy(`${window.location.origin}/api/cal/${calendarId}.ics`)}
+            aria-label="Copy iCal feed URL"
+          >
+            ⧉ Copy .ics URL
+          </button>
+        </div>
+        <p className="meta-note" style={{ marginTop: 6, marginBottom: 0 }}>
+          One-way sync · updates appear in your calendar automatically
+        </p>
+      </div>
+
       <button type="button" className="btn btn-secondary welcome-cta" onClick={() => onContinue()}>
         Open my calendar →
       </button>

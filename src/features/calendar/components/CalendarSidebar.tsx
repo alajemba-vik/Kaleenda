@@ -53,27 +53,32 @@ export function CalendarSidebar({
   return (
     <div className="cs-panel atelier-sidebar-card">
 
-      {/* ── Upcoming events ── */}
-      <section className="cs-section">
-        <h3 className="cs-section-label">Upcoming events</h3>
-        <div className="cs-event-list">
-          {upcomingEvents.length === 0 ? (
-            <p className="cs-empty">Nothing scheduled yet.</p>
-          ) : (
-            upcomingEvents.map((ev) => (
-              <div key={ev.id} className="cs-event-card">
-                <span className="cs-event-icon" aria-hidden="true">
-                  {moodIcon[ev.mood ?? ''] ?? '📅'}
-                </span>
-                <div className="cs-event-info">
-                  <span className="cs-event-name">{ev.title}</span>
-                  <span className="cs-event-date">{formatEventDate(ev.event_date)}</span>
-                </div>
-              </div>
-            ))
-          )}
+      {/* ── Upcoming events (Glassy) ── */}
+      <div className="cs-events-glass-section">
+        <h3 className="cs-events-glass-label">Upcoming Events</h3>
+        <div className="cs-events-glass-container">
+          <ul className="cs-events-glass-list">
+            {upcomingEvents.length === 0 ? (
+              <li className="cs-events-empty">Nothing scheduled yet.</li>
+            ) : (
+              upcomingEvents.map((ev) => (
+                <li key={ev.id} className="cs-event-glass-card group">
+                  <div className="cs-event-glass-icon-box">
+                    <span className="cs-event-glass-emoji" aria-hidden="true">
+                      {moodIcon[ev.mood ?? ''] ?? '📅'}
+                    </span>
+                  </div>
+                  <div className="cs-event-glass-info">
+                    <span className="cs-event-glass-title">{ev.title}</span>
+                    <span className="cs-event-glass-date">{formatEventDate(ev.event_date)}</span>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
         </div>
-      </section>
+      </div>
+
 
       {/* ── Themes ── */}
       <section className="cs-section">
