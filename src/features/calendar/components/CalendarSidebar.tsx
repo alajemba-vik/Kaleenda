@@ -34,7 +34,6 @@ type Props = {
   canPickTheme: boolean
   isOwner: boolean
   canWrite: boolean
-  accessLabel: string
   upcomingEvents: CalendarEvent[]
   updateTheme: (t: CalendarTheme) => Promise<void>
   onManageCodes: () => void
@@ -45,7 +44,6 @@ export function CalendarSidebar({
   canPickTheme,
   isOwner,
   canWrite,
-  accessLabel,
   upcomingEvents,
   updateTheme,
   onManageCodes,

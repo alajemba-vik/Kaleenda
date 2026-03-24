@@ -121,7 +121,6 @@ export function CalendarPage() {
   const canWrite = accessLevel === 'owner' || accessLevel === 'write'
   const isOwner = accessLevel === 'owner'
   const canPickTheme = canWrite
-  const accessLabel = isOwner ? 'Owner' : accessLevel === 'write' ? 'Write' : 'View only'
 
   async function deleteCalendar() {
     if (!authClient || !calendarUuid) return
@@ -319,7 +318,6 @@ export function CalendarPage() {
           canPickTheme={canPickTheme}
           isOwner={isOwner}
           canWrite={canWrite}
-          accessLabel={accessLabel}
           upcomingEvents={upcomingEvents}
           updateTheme={updateTheme}
           onManageCodes={() => setSettingsOpen(true)}
