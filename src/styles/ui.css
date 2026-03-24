@@ -624,6 +624,9 @@ body.add-event-modal-open .site-footer {
   --cal-today: #378add;
   --cal-event: #0c447c;
   --cal-event-text: #b5d4f4;
+  --text-primary: var(--text-on-dark);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: var(--text-muted-dark);
 }
 
 .calendar-theme-root[data-theme='pastel'] {
@@ -651,6 +654,9 @@ body.add-event-modal-open .site-footer {
   --cal-today: #378add;
   --cal-event: #0c447c;
   --cal-event-text: #85b7eb;
+  --text-primary: var(--text-on-dark);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: var(--text-muted-dark);
 }
 
 .calendar-theme-root[data-theme='sunset'] {

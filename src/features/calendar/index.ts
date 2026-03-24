@@ -3,7 +3,6 @@ export * from './components/AddEventPanel'
 export * from './components/CalendarHeader'
 export * from './components/CalendarSidebar'
 export * from './components/EventDetailModal'
-export * from './components/ManageCodesModal'
 export * from './components/WelcomeCodes'
 export * from './components/CodeEntry'
 
