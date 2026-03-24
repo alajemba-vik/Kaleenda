@@ -230,6 +230,8 @@ body.add-event-modal-open .mp-footer {
 
 /* ---- Page header ---- */
 .kp-header {
+  position: relative;
+  z-index: 50;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
