@@ -164,6 +164,20 @@ body.add-event-modal-open .mp-footer {
   box-shadow: 4px 0 32px rgba(0,0,0,0.08);
 }
 
+.kp-sidebar-right {
+  left: auto;
+  right: 0;
+  border-right: none;
+  border-left: 0.5px solid rgba(0,0,0,0.08);
+  transform: translateX(100%);
+  width: 360px;
+}
+
+.kp-sidebar-right.open {
+  transform: translateX(0);
+  box-shadow: -4px 0 32px rgba(0,0,0,0.08);
+}
+
 .kp-sidebar-header {
   display: flex;
   justify-content: space-between;
@@ -226,6 +240,10 @@ body.add-event-modal-open .mp-footer {
 
 .kp-sidebar-open .kp-main {
   padding-left: calc(280px + 40px);
+}
+
+.kp-settings-open .kp-main {
+  padding-right: calc(360px + 40px);
 }
 
 /* ---- Page header ---- */

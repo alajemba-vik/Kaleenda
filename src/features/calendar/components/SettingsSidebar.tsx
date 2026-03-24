@@ -18,7 +18,7 @@ type Props = {
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY!
 
-export function SettingsModal({
+export function SettingsSidebar({
   open,
   onClose,
   calendarId,
@@ -113,21 +113,18 @@ export function SettingsModal({
     try { await navigator.clipboard.writeText(text) } catch {}
   }
 
-  if (!open) return null
-
   return (
-    <div className="modal-backdrop">
-      <div className="modal-card">
-        <header className="modal-header">
-          <h2 className="modal-title">Calendar Settings</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-            ✕
-          </button>
-        </header>
+    <aside className={`kp-sidebar kp-sidebar-right ${open ? 'open' : ''}`}>
+      <div className="kp-sidebar-header">
+        <h2 className="kp-sidebar-title">Settings</h2>
+        <button type="button" className="kp-icon-btn" onClick={onClose} aria-label="Close">
+          ✕
+        </button>
+      </div>
 
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* General Section */}
+      <div className="kp-sidebar-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto' }}>
+        
+        {/* General Section */}
           <section>
             <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '12px' }}>General</h3>
             <form onSubmit={handleRename} style={{ display: 'flex', gap: '8px' }}>
@@ -345,7 +342,6 @@ export function SettingsModal({
           )}
 
         </div>
-      </div>
-    </div>
+    </aside>
   )
 }

@@ -2,7 +2,8 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
 const resendApiKey = Deno.env.get('RESEND_API_KEY')
-const resendFrom = Deno.env.get('RESEND_FROM_EMAIL') || 'onboarding@resend.dev'
+const resendFromRaw = Deno.env.get('RESEND_FROM_EMAIL') || 'onboarding@resend.dev'
+const resendFrom = resendFromRaw.includes('kaleenda.app') ? 'onboarding@resend.dev' : resendFromRaw
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
