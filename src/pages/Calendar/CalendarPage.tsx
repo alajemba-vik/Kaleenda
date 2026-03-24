@@ -7,7 +7,8 @@ import { AddEventPanel } from '@/features/calendar'
 import { CalendarSidebar } from '@/features/calendar'
 import { CodeEntry } from '@/features/calendar'
 import { EventDetailModal } from '@/features/calendar'
-import { ManageCodesModal } from '@/features/calendar'
+import { SettingsModal } from '@/features/calendar/components/SettingsModal'
+import { ActivityFeed } from '@/features/calendar/components/ActivityFeed'
 import { PwaInstallBanner } from '@/components/PwaInstallBanner'
 import { filterEventsForMonth, MonthCalendar } from '@/features/calendar'
 import { WelcomeCodes } from '@/features/calendar'
@@ -64,6 +65,7 @@ export function CalendarPage() {
     phase,
     setPhase,
     metaName,
+    setMetaName,
     sessionToken,
     accessLevel,
     jwt,
@@ -103,7 +105,7 @@ export function CalendarPage() {
   const [rememberDevice, setRememberDevice] = useState(true)
 
   const [addOpen, setAddOpen] = useState(false)
-  const [manageOpen, setManageOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [shareBusy, setShareBusy] = useState(false)
   const [themeBusy, setThemeBusy] = useState(false)
   const shareCardRef = useRef<HTMLDivElement | null>(null)
@@ -320,7 +322,7 @@ export function CalendarPage() {
           accessLabel={accessLabel}
           upcomingEvents={upcomingEvents}
           updateTheme={updateTheme}
-          onManageCodes={() => setManageOpen(true)}
+          onManageCodes={() => setSettingsOpen(true)}
         />
       </div>
 
@@ -355,14 +357,21 @@ export function CalendarPage() {
 
             {/* Actions */}
             <div className="kp-header-actions">
-              <button
-                type="button"
-                className="kp-header-btn"
-                onClick={downloadMonthShareCard}
-                disabled={shareBusy}
-              >
-                ↗ {shareBusy ? 'Generating…' : 'Share'}
-              </button>
+              <ActivityFeed
+                calendarId={calendarId}
+                calendarUuid={calendarUuid || ''}
+                sessionToken={sessionToken}
+              />
+              {isOwner && (
+                <button
+                  type="button"
+                  className="kp-header-btn"
+                  onClick={downloadMonthShareCard}
+                  disabled={shareBusy}
+                >
+                  ↗ {shareBusy ? 'Generating…' : 'Share'}
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -441,16 +450,24 @@ export function CalendarPage() {
         onDelete={(ev) => deleteEvent(ev)}
       />
 
-      {sessionToken ? (
-        <ManageCodesModal
-          open={manageOpen}
-          onClose={() => setManageOpen(false)}
-          anon={anon}
-          sessionToken={sessionToken}
-          initialOwner={createState?.ownerCode}
-          onDeleteCalendar={isOwner ? deleteCalendar : undefined}
-        />
-      ) : null}
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        calendarId={calendarId}
+        calendarUuid={calendarUuid || ''}
+        accessLevel={accessLevel ?? 'read'}
+        currentName={metaName || 'Calendar'}
+        onNameUpdate={async (_newName) => {
+          // Force refetch metadata
+          try {
+            const { data } = await anon.rpc('get_calendar_meta', { p_public_id: calendarId })
+            if (data && typeof data === 'object' && 'name' in data) {
+              setMetaName(data.name as string)
+            }
+          } catch (e) { console.error(e) }
+        }}
+        onDeleteCalendar={deleteCalendar}
+      />
 
       {/* Share card (hidden, used for image export) */}
       <div className="share-card-host" aria-hidden="true">

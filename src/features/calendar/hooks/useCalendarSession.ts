@@ -123,6 +123,7 @@ export function useCalendarSession(calendarId: string, fromCreateNav: boolean) {
     phase,
     setPhase,
     metaName,
+    setMetaName,
     sessionToken,
     accessLevel,
     jwt,
@@ -136,3 +137,4 @@ export function useCalendarSession(calendarId: string, fromCreateNav: boolean) {
     establishSession,
   }
 }
+
