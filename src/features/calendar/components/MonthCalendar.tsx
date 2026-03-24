@@ -135,7 +135,7 @@ export function MonthCalendar({
           <div>No events yet</div>
           <span>
             {showAddHint
-              ? 'Use the blue + button to add the first event.'
+              ? 'Use the + button to add the first event.'
               : 'Ask an owner for write access to add events.'}
           </span>
         </div>
