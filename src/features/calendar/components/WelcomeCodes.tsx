@@ -296,7 +296,7 @@ export function WelcomeCodes({
         <p className="welcome-ical-label">Sync to Google / Apple / Outlook</p>
         <div className="welcome-ical-row">
           <a
-            href={`https://calendar.google.com/calendar/r?cid=webcal://${window.location.host}/api/cal/${calendarId}.ics`}
+            href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(`${import.meta.env.VITE_SUPABASE_URL!.replace(/^https?:\/\//, 'webcal://')}/functions/v1/ical-feed?id=${calendarId}`)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-secondary welcome-ical-btn"
@@ -309,7 +309,7 @@ export function WelcomeCodes({
             Google Calendar
           </a>
           <a
-            href={`webcal://${window.location.host}/api/cal/${calendarId}.ics`}
+            href={`${import.meta.env.VITE_SUPABASE_URL!.replace(/^https?:\/\//, 'webcal://')}/functions/v1/ical-feed?id=${calendarId}`}
             className="btn btn-secondary welcome-ical-btn"
             aria-label="Subscribe to Apple Calendar"
           >
