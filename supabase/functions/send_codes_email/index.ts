@@ -140,7 +140,7 @@ serve(async (req) => {
     </div>
   `
 
-  const resendFrom = Deno.env.get('RESEND_FROM_EMAIL') ?? 'Kaleenda <noreply@kaleenda.app>'
+  const resendFrom = Deno.env.get('RESEND_FROM_EMAIL') ?? 'onboarding@resend.dev'
 
   const resendResponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',

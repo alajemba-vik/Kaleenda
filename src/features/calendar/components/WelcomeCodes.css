@@ -420,3 +420,42 @@
     width: 100%;
   }
 }
+
+/* ── iCal subscribe section ── */
+.welcome-ical-section {
+  margin: 4px 0 10px;
+  padding: 14px;
+  background: #f8f7f3;
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+}
+
+.welcome-ical-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 10px;
+}
+
+.welcome-ical-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.welcome-ical-btn {
+  flex: 1;
+  min-width: 120px;
+  height: 38px;
+  font-size: 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.welcome-ical-btn:hover { text-decoration: none; }

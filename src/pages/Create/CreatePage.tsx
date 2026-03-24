@@ -98,7 +98,7 @@ export function CreatePage() {
           </div>
 
           <section className="create-card" aria-label="Create calendar form">
-            <h1 className="create-title">What are we organizing?</h1>
+            <h1 className="create-title">Give your calendar a name</h1>
 
             {err ? <p className="create-error">{err}</p> : null}
 
