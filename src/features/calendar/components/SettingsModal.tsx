@@ -147,6 +147,63 @@ export function SettingsModal({
             </form>
           </section>
 
+          {/* Email Subscriptions */}
+          <section>
+            <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '12px' }}>Email Reminders</h3>
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault()
+                const fd = new FormData(e.currentTarget)
+                const email = fd.get('email') as string
+                const notifyOnNew = fd.get('notify_on_new') === 'on'
+                const remindMins = parseInt(fd.get('remind_minutes') as string, 10)
+                
+                if (!email || !sessionToken || !calendarUuid) return
+                try {
+                  const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+                    global: { headers: { Authorization: `Bearer ${sessionToken}` } },
+                  })
+                  const { error } = await authClient
+                    .from('subscriptions')
+                    .upsert({
+                      calendar_id: calendarUuid,
+                      email,
+                      notify_on_new: notifyOnNew,
+                      remind_minutes_before: isNaN(remindMins) || remindMins <= 0 ? null : remindMins,
+                    }, { onConflict: 'calendar_id, email' })
+                  
+                  if (error) throw new Error(error.message)
+                  alert('Subscribed successfully!')
+                } catch (err: any) {
+                  alert(`Failed to subscribe: ${err.message}`)
+                }
+              }} 
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+            >
+              <input type="email" name="email" className="field" placeholder="your@email.com" required disabled={!sessionToken} />
+              
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
+                <input type="checkbox" name="notify_on_new" defaultChecked disabled={!sessionToken} />
+                Email me when new events are added
+              </label>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+                Remind me
+                <select name="remind_minutes" className="field" style={{ padding: '4px 8px', fontSize: '13px', width: 'auto' }} disabled={!sessionToken} defaultValue="-1">
+                  <option value="-1">Don't remind me</option>
+                  <option value="5">5 mins before</option>
+                  <option value="30">30 mins before</option>
+                  <option value="60">1 hour before</option>
+                  <option value="1440">1 day before</option>
+                </select>
+              </div>
+
+              <button type="submit" className="btn btn-secondary" disabled={!sessionToken}>
+                Subscribe
+              </button>
+            </form>
+          </section>
+
           {/* Access Codes Section */}
           {isOwner && (
             <section>
