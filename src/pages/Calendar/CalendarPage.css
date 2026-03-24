@@ -367,6 +367,13 @@ body.add-event-modal-open .mp-footer {
 
 .kp-header-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
+.kp-header-icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
 /* ---- Calendar card ---- */
 .kp-grid-card {
   background: var(--surface);
