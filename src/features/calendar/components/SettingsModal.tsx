@@ -236,6 +236,100 @@ export function SettingsModal({
             </section>
           )}
 
+          {/* Import Events (CSV / ICS) */}
+          {isOwner && (
+            <section>
+              <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '12px' }}>Import Events (CSV / ICS)</h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginBottom: '8px', lineHeight: 1.4 }}>
+                Upload a <code>.csv</code> or <code>.ics</code> file to add multiple events at once.<br />
+                <a href={`data:text/csv;charset=utf-8,Title,Date,Start Time,End Time,Notes,Mood%0ATeam Practice,2026-04-01,18:00,19:30,Bring boots,panic%0ACup Final,2026-04-15,15:00,17:00,,celebration`} download="kaleenda_template.csv" style={{ color: 'var(--accent, #3d6fff)', textDecoration: 'underline' }}>
+                  Download CSV template
+                </a>
+              </p>
+              
+              <input 
+                type="file" 
+                accept=".csv,.ics"
+                disabled={codesBusy}
+                style={{ fontSize: '13px' }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file || !sessionToken || !calendarUuid) return
+                  
+                  setCodesBusy(true) // Reusing this busy flag for imports temporarily
+                  try {
+                    const text = await file.text()
+                    let eventsToInsert: any[] = []
+
+                    if (file.name.endsWith('.csv')) {
+                      // Dynamically import papaparse to keep bundle small if unused
+                      const Papa = (await import('papaparse')).default
+                      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true })
+                      
+                      eventsToInsert = parsed.data.map((row: any) => ({
+                        calendar_id: calendarUuid,
+                        title: row['Title'] || 'Untitled Event',
+                        event_date: row['Date'] || new Date().toISOString().split('T')[0],
+                        start_time: row['Start Time'] ? row['Start Time'].slice(0, 5) : null,
+                        end_time: row['End Time'] ? row['End Time'].slice(0, 5) : null,
+                        note: row['Notes'] || null,
+                        mood: row['Mood'] || 'chill',
+                        creator_name: 'Import' // Track that these were imported
+                      }))
+                    } else if (file.name.endsWith('.ics')) {
+                      // Dynamically import ical.js
+                      const ICAL = (await import('ical.js')).default
+                      const jcalData = ICAL.parse(text)
+                      const comp = new ICAL.Component(jcalData)
+                      const vevents = comp.getAllSubcomponents('vevent')
+                      
+                      eventsToInsert = vevents.map(e => {
+                        const summary = e.getFirstPropertyValue('summary')
+                        const dtstart = e.getFirstPropertyValue('dtstart')
+                        let eventDate = new Date().toISOString().split('T')[0]
+                        let startTime = null
+                        
+                        if (dtstart) {
+                          const dtStr = dtstart.toString()
+                          eventDate = dtStr.split('T')[0]
+                          if (dtStr.includes('T')) {
+                            startTime = dtStr.split('T')[1].slice(0, 5)
+                          }
+                        }
+
+                        return {
+                          calendar_id: calendarUuid,
+                          title: summary || 'Imported Event',
+                          event_date: eventDate,
+                          start_time: startTime,
+                          creator_name: 'Import'
+                        }
+                      })
+                    }
+
+                    if (eventsToInsert.length === 0) {
+                      throw new Error('No valid events found in file')
+                    }
+
+                    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+                      global: { headers: { Authorization: `Bearer ${sessionToken}` } },
+                    })
+
+                    const { error } = await authClient.from('events').insert(eventsToInsert)
+                    if (error) throw new Error(error.message)
+
+                    alert(`Successfully imported ${eventsToInsert.length} events!`)
+                  } catch (err: any) {
+                    alert(`Import failed: ${err.message}`)
+                  } finally {
+                    e.target.value = ''
+                    setCodesBusy(false)
+                  }
+                }}
+              />
+            </section>
+          )}
+
           {/* Danger Zone */}
           {isOwner && (
             <section style={{ marginTop: '12px', paddingTop: '24px', borderTop: '0.5px solid var(--border)' }}>
