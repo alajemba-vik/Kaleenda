@@ -140,8 +140,18 @@ serve(async (req) => {
     </div>
   `
 
-  const resendFromRaw = Deno.env.get('RESEND_FROM_EMAIL') ?? 'onboarding@resend.dev'
-  const resendFrom = resendFromRaw.includes('kaleenda.app') ? 'onboarding@resend.dev' : resendFromRaw
+  let resendFromRaw = Deno.env.get('RESEND_FROM_EMAIL') ?? 'onboarding@resend.dev'
+  if (resendFromRaw.includes('kaleenda.app')) {
+    resendFromRaw = 'onboarding@resend.dev'
+  }
+  
+  let fromEmail = resendFromRaw
+  const emailMatch = resendFromRaw.match(/<(.+?)>/)
+  if (emailMatch) {
+    fromEmail = emailMatch[1]
+  }
+
+  const resendFrom = `Kaleenda <${fromEmail}>`
 
   const resendResponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',

@@ -808,3 +808,11 @@ body.add-event-modal-open .site-footer {
     grid-template-columns: 1fr;
   }
 }
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

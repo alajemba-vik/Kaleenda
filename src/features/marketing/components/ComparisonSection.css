@@ -1,6 +1,5 @@
 /* ── Shell ────────────────────────────────────────────────────────── */
 .cs-shell {
-  background: var(--bg);
   padding: 96px 24px;
 }
 
@@ -12,7 +11,8 @@
 
 /* ── Title — matches image: large centered serif with italic emphasis ─ */
 .cs-title {
-  font-family: var(--logo-font); /* Instrument Serif */
+  font-family: var(--logo-font);
+  /* Instrument Serif */
   font-size: clamp(2.2rem, 5vw, 3.4rem);
   font-weight: 400;
   letter-spacing: -0.02em;

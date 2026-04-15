@@ -152,17 +152,10 @@ export function WelcomeCodes({
       setEmailSentTo(trimmed)
       setEmail('')
     } catch (e) {
-      const msg = e instanceof Error && e.message ? e.message : 'Could not send email right now.'
-      if (
-        msg.includes('NOT_FOUND') ||
-        msg.includes('Requested function was not found')
-      ) {
-        setEmailError('Email service is not deployed yet (send_codes_email). Please deploy the function and try again.')
-      } else if (msg.includes('Failed to send a request to the Edge Function')) {
-        setEmailError('Email service is unavailable right now. Please try again in a minute.')
-      } else {
-        setEmailError(msg)
-      }
+      // Log full error for debugging
+      console.error('Email send error:', e)
+      // Show generic message to user
+      setEmailError('Unable to send email. Please try again in a moment.')
     } finally {
       setEmailBusy(false)
     }
@@ -308,13 +301,15 @@ export function WelcomeCodes({
             </svg>
             Google Calendar
           </a>
-          <a
-            href={`${import.meta.env.VITE_SUPABASE_URL!.replace(/^https?:\/\//, 'webcal://')}/functions/v1/ical-feed?id=${calendarId}`}
-            className="btn btn-secondary welcome-ical-btn"
-            aria-label="Subscribe to Apple Calendar"
-          >
-            🍏 Apple / webcal
-          </a>
+          {/Mac|iPod|iPhone|iPad/.test(navigator.userAgent) && (
+            <a
+              href={`${import.meta.env.VITE_SUPABASE_URL!.replace(/^https?:\/\//, 'webcal://')}/functions/v1/ical-feed?id=${calendarId}`}
+              className="btn btn-secondary welcome-ical-btn"
+              aria-label="Subscribe to Apple Calendar"
+            >
+              🍏 Apple / webcal
+            </a>
+          )}
           <button
             type="button"
             className="btn btn-secondary welcome-ical-btn"

@@ -7,24 +7,11 @@ import { CreateMascot } from '@/features/marketing'
 import './CreatePage.css'
 
 function formatSupabaseError(e: unknown): string {
-  if (e instanceof TypeError && e.message === 'Failed to fetch') {
-    return [
-      'Could not reach Supabase (network error).',
-      '1) Confirm VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env at the project root, then restart the dev server.',
-      '2) In the Supabase dashboard, make sure the project is not paused.',
-      '3) Try another browser or disable ad blockers / VPN.',
-      '4) Open your Project URL in a new tab — if it does not load, fix DNS or firewall.',
-    ].join(' ')
-  }
-  if (e && typeof e === 'object') {
-    const o = e as { message?: string; details?: string; hint?: string }
-    const parts = [o.message, o.details, o.hint].filter(
-      (x): x is string => typeof x === 'string' && x.length > 0,
-    )
-    if (parts.length) return parts.join(' — ')
-  }
-  if (e instanceof Error && e.message) return e.message
-  return 'Could not create calendar'
+  // Log full error to console for debugging
+  console.error('Calendar creation error:', e)
+
+  // Show generic user-friendly message
+  return 'Unable to create calendar. Please try again in a moment.'
 }
 
 export function CreatePage() {

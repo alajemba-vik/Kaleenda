@@ -524,8 +524,15 @@
 }
 
 @keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 .how-mock-btn {
@@ -542,7 +549,7 @@
   letter-spacing: -0.01em;
   cursor: default;
   transition: transform 0.15s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* ── Step 2: Share ──────────────────────────────────────────────── */
@@ -656,8 +663,15 @@
 }
 
 @keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.65; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.65;
+  }
 }
 
 .how-live-strip {
@@ -880,7 +894,7 @@
   transform: translateY(12px);
 }
 
-.stats-dark-item + .stats-dark-item {
+.stats-dark-item+.stats-dark-item {
   border-left: 0.5px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -963,7 +977,7 @@
   color: #fff;
   margin-bottom: 14px;
   letter-spacing: 0.02em;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 .t-avatar-img {
@@ -973,15 +987,15 @@
   object-fit: cover;
   object-position: top center;
   margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   border: 2px solid var(--border);
 }
 
 /* ── Social proof banner ────────────────────────────────────────────── */
 .social-proof-banner {
   background: linear-gradient(135deg, #f0f4ff 0%, #fff 60%, #f9f0ff 100%);
-  border-top: 1px solid rgba(61,111,255,0.1);
-  border-bottom: 1px solid rgba(61,111,255,0.1);
+  border-top: 1px solid rgba(61, 111, 255, 0.1);
+  border-bottom: 1px solid rgba(61, 111, 255, 0.1);
   padding: 20px 24px;
 }
 
@@ -1161,6 +1175,7 @@
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1173,6 +1188,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1185,6 +1201,7 @@
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1197,6 +1214,7 @@
     opacity: 0;
     transform: translateY(12px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1208,9 +1226,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(0.96);
   }
+
   100% {
     transform: scale(1);
   }
@@ -1218,9 +1238,12 @@
 
 /* Button hover and active spring effect */
 @keyframes buttonSpring {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) scale(1);
   }
+
   50% {
     transform: translateY(-2px) scale(1.02);
   }
@@ -1228,9 +1251,12 @@
 
 /* Priority 5: Bento card hover with blue glow */
 @keyframes bentoGlowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: var(--shadow-md), 0 0 0 0 rgba(61, 111, 255, 0.4);
   }
+
   50% {
     box-shadow: var(--shadow-md), 0 0 0 8px rgba(61, 111, 255, 0);
   }
@@ -1238,15 +1264,20 @@
 
 /* Priority 6: Plushie bounce on event hover */
 @keyframes plushipBounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
+
   25% {
     transform: translateY(-8px) rotate(-2deg);
   }
+
   50% {
     transform: translateY(-14px) rotate(2deg);
   }
+
   75% {
     transform: translateY(-6px) rotate(-1deg);
   }
@@ -1254,15 +1285,19 @@
 
 /* Subtle float animation for plushies */
 @keyframes kl-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-6px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .hero-content,
   .hero-pill,
   .hero-headline,
@@ -1348,7 +1383,7 @@
     padding: 0;
   }
 
-  .stats-dark-item + .stats-dark-item {
+  .stats-dark-item+.stats-dark-item {
     border-left: 0;
   }
 
@@ -1365,4 +1400,3 @@
     gap: 8px;
   }
 }
-

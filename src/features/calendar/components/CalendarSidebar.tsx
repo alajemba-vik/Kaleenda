@@ -36,6 +36,7 @@ type Props = {
   canWrite: boolean
   upcomingEvents: CalendarEvent[]
   updateTheme: (t: CalendarTheme) => Promise<void>
+  onManageCodes: () => void
 }
 
 export function CalendarSidebar({
@@ -45,6 +46,7 @@ export function CalendarSidebar({
   canWrite,
   upcomingEvents,
   updateTheme,
+  onManageCodes,
 }: Props) {
   return (
     <div className="cs-panel atelier-sidebar-card">
@@ -109,6 +111,16 @@ export function CalendarSidebar({
         <span className={`badge ${isOwner ? 'badge-owner' : canWrite ? 'badge-write' : 'badge-read'}`}>
           {isOwner ? '★ Owner' : canWrite ? '✏ Write' : '👁 View only'}
         </span>
+        {isOwner && (
+          <button 
+            type="button" 
+            className="cs-theme-btn" 
+            style={{ marginTop: '12px', width: '100%', justifyContent: 'center', background: 'var(--surface-2)' }}
+            onClick={onManageCodes}
+          >
+            Manage Codes
+          </button>
+        )}
       </section>
 
     </div>

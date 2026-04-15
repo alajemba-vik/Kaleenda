@@ -1,5 +1,6 @@
 {
   "routes": [
+    { "src": "/api/contact", "dest": "/api/contact.ts" },
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }
   ]

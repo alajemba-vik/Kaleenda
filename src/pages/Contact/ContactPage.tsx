@@ -33,7 +33,10 @@ export function ContactPage() {
       }
       setState('success')
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      // Log full error for debugging
+      console.error('Contact form error:', err)
+      // Show generic message to user
+      setErrorMsg('Unable to send message. Please try again in a moment.')
       setState('error')
     }
   }

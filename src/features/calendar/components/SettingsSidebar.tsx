@@ -11,6 +11,7 @@ type Props = {
   currentName: string
   onNameUpdate: (newName: string) => void
   onDeleteCalendar: () => Promise<void>
+  onUpgradeAccess: (code: string) => Promise<void>
 }
 
 // NOTE: Uses the same Supabase URL/key logic found in createAnonClient, but we'll 
@@ -27,14 +28,17 @@ export function SettingsSidebar({
   currentName,
   onNameUpdate,
   onDeleteCalendar,
+  onUpgradeAccess,
 }: Props) {
   const isOwner = accessLevel === 'owner'
   
   const [name, setName] = useState(currentName)
   const [savingName, setSavingName] = useState(false)
   const [codesBusy, setCodesBusy] = useState(false)
-  
-  const [codes, setCodes] = useState<{ write_code: string; read_code: string; owner_code?: string } | null>(null)
+  const [upgradeCode, setUpgradeCode] = useState('')
+  const [upgradeMessage, setUpgradeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [subscribeMessage, setSubscribeMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
   const [sessionToken, setSessionToken] = useState<string | null>(null)
 
   useEffect(() => {
@@ -44,27 +48,6 @@ export function SettingsSidebar({
       if (token) setSessionToken(token)
     }
   }, [open, currentName, calendarId])
-
-  useEffect(() => {
-    if (open && sessionToken && isOwner && !codes && !codesBusy) {
-      void fetchCodes()
-    }
-  }, [open, sessionToken, isOwner])
-
-  async function fetchCodes() {
-    setCodesBusy(true)
-    try {
-      const authClient = createClient(supabaseUrl, supabaseAnonKey, {
-        global: { headers: { Authorization: `Bearer ${sessionToken}` } },
-      })
-      const { data, error } = await authClient.rpc('get_calendar_codes', { p_session_token: sessionToken })
-      if (!error && data) {
-        setCodes(data as any)
-      }
-    } finally {
-      setCodesBusy(false)
-    }
-  }
 
   async function handleRename(e: FormEvent) {
     e.preventDefault()
@@ -90,29 +73,6 @@ export function SettingsSidebar({
     }
   }
 
-  async function handleRegenerateCodes() {
-    if (!sessionToken || !isOwner) return
-    const ok = window.confirm('Generate new codes? Old read/write codes will stop working immediately.')
-    if (!ok) return
-    
-    setCodesBusy(true)
-    try {
-      const authClient = createClient(supabaseUrl, supabaseAnonKey, {
-        global: { headers: { Authorization: `Bearer ${sessionToken}` } },
-      })
-      const { data, error } = await authClient.rpc('regenerate_codes', { p_session_token: sessionToken })
-      if (!error && data) {
-        setCodes((prev) => ({ ...prev, ...(data as any) }))
-      }
-    } finally {
-      setCodesBusy(false)
-    }
-  }
-
-  async function copy(text: string) {
-    try { await navigator.clipboard.writeText(text) } catch {}
-  }
-
   return (
     <aside className={`kp-sidebar kp-sidebar-right ${open ? 'open' : ''}`}>
       <div className="kp-sidebar-header">
@@ -122,26 +82,70 @@ export function SettingsSidebar({
         </button>
       </div>
 
-      <div className="kp-sidebar-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto' }}>
+      <div className="kp-sidebar-content hide-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto' }}>
         
         {/* General Section */}
           <section>
             <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '12px' }}>General</h3>
-            <form onSubmit={handleRename} style={{ display: 'flex', gap: '8px' }}>
+            <form onSubmit={handleRename} style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
               <input
                 type="text"
                 className="field"
+                style={{ flex: 1, minHeight: '36px' }}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Calendar Name"
                 disabled={savingName || !isOwner}
               />
               {isOwner && (
-                <button type="submit" className="btn btn-secondary" disabled={savingName || name === currentName}>
+                <button type="submit" className="btn btn-secondary" style={{ minHeight: '36px', height: '100%' }} disabled={savingName || name === currentName}>
                   {savingName ? '...' : 'Save'}
                 </button>
               )}
             </form>
+          </section>
+
+          {/* Upgrade Access */}
+          <section>
+            <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '12px' }}>Change Access Level</h3>
+            <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginBottom: '8px', lineHeight: 1.4 }}>
+              Enter a read, write, or owner code to upgrade your access on this device.
+            </p>
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              if (!upgradeCode.trim() || codesBusy) return
+              setCodesBusy(true)
+              setUpgradeMessage(null)
+              try {
+                await onUpgradeAccess(upgradeCode.trim())
+                setUpgradeMessage({ type: 'success', text: 'Access level updated!' })
+                setUpgradeCode('')
+                setTimeout(() => setUpgradeMessage(null), 3000)
+              } catch (err) {
+                console.error('Upgrade error:', err)
+                setUpgradeMessage({ type: 'error', text: 'Unable to update access. Please try again.' })
+              } finally {
+                setCodesBusy(false)
+              }
+            }} style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+              <input
+                type="text"
+                className="field"
+                style={{ flex: 1, minHeight: '36px', fontFamily: 'monospace' }}
+                value={upgradeCode}
+                onChange={(e) => setUpgradeCode(e.target.value)}
+                placeholder="Enter access code"
+                disabled={codesBusy}
+              />
+              <button type="submit" className="btn btn-secondary" style={{ minHeight: '36px', height: '100%' }} disabled={codesBusy || !upgradeCode.trim()}>
+                {codesBusy ? '...' : 'Upgrade'}
+              </button>
+            </form>
+            {upgradeMessage && (
+              <p style={{ fontSize: '12px', color: upgradeMessage.type === 'success' ? 'var(--accent)' : 'var(--error, #d32f2f)', marginTop: '8px' }}>
+                {upgradeMessage.text}
+              </p>
+            )}
           </section>
 
           {/* Email Subscriptions */}
@@ -170,23 +174,25 @@ export function SettingsSidebar({
                     }, { onConflict: 'calendar_id, email' })
                   
                   if (error) throw new Error(error.message)
-                  alert('Subscribed successfully!')
-                } catch (err: any) {
-                  alert(`Failed to subscribe: ${err.message}`)
+                  setSubscribeMessage({ type: 'success', text: 'Subscribed successfully!' })
+                  setTimeout(() => setSubscribeMessage(null), 3000)
+                } catch (err) {
+                  console.error('Subscribe error:', err)
+                  setSubscribeMessage({ type: 'error', text: 'Unable to subscribe. Please try again.' })
                 }
               }} 
               style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
             >
-              <input type="email" name="email" className="field" placeholder="your@email.com" required disabled={!sessionToken} />
+              <input type="email" name="email" className="field" placeholder="your@email.com" required />
               
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', cursor: 'pointer' }}>
-                <input type="checkbox" name="notify_on_new" defaultChecked disabled={!sessionToken} />
+                <input type="checkbox" name="notify_on_new" defaultChecked />
                 Email me when new events are added
               </label>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
                 Remind me
-                <select name="remind_minutes" className="field" style={{ padding: '4px 8px', fontSize: '13px', width: 'auto' }} disabled={!sessionToken} defaultValue="-1">
+                <select name="remind_minutes" className="field" style={{ padding: '4px 8px', fontSize: '13px', width: 'auto' }} defaultValue="-1">
                   <option value="-1">Don't remind me</option>
                   <option value="5">5 mins before</option>
                   <option value="30">30 mins before</option>
@@ -195,43 +201,16 @@ export function SettingsSidebar({
                 </select>
               </div>
 
-              <button type="submit" className="btn btn-secondary" disabled={!sessionToken}>
+              <button type="submit" className="btn btn-secondary" style={{ marginTop: '8px' }}>
                 Subscribe
               </button>
             </form>
+            {subscribeMessage && (
+              <p style={{ fontSize: '12px', color: subscribeMessage.type === 'success' ? 'var(--accent)' : 'var(--error, #d32f2f)', marginTop: '8px' }}>
+                {subscribeMessage.text}
+              </p>
+            )}
           </section>
-
-          {/* Access Codes Section */}
-          {isOwner && (
-            <section>
-              <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '12px' }}>Codes</h3>
-              
-              {codesBusy && !codes ? (
-                <p>Loading codes...</p>
-              ) : codes ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--surface-2)', borderRadius: '12px', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '4px' }}>Write Access</div>
-                      <div style={{ fontFamily: 'monospace', fontSize: '15px' }}>{codes.write_code}</div>
-                    </div>
-                    <button type="button" className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '12px', height: 'auto' }} onClick={() => copy(codes.write_code)}>Copy</button>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--surface-2)', borderRadius: '12px', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: '4px' }}>Read Access</div>
-                      <div style={{ fontFamily: 'monospace', fontSize: '15px' }}>{codes.read_code}</div>
-                    </div>
-                    <button type="button" className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '12px', height: 'auto' }} onClick={() => copy(codes.read_code)}>Copy</button>
-                  </div>
-
-                  <button type="button" className="btn btn-secondary" onClick={handleRegenerateCodes} disabled={codesBusy} style={{ marginTop: '8px' }}>
-                    Regenerate Share Codes
-                  </button>
-                </div>
-              ) : null}
-            </section>
-          )}
 
           {/* Import Events (CSV / ICS) */}
           {isOwner && (
@@ -244,86 +223,94 @@ export function SettingsSidebar({
                 </a>
               </p>
               
-              <input 
-                type="file" 
-                accept=".csv,.ics"
-                disabled={codesBusy}
-                style={{ fontSize: '13px' }}
-                onChange={async (e) => {
-                  const file = e.target.files?.[0]
-                  if (!file || !sessionToken || !calendarUuid) return
-                  
-                  setCodesBusy(true) // Reusing this busy flag for imports temporarily
-                  try {
-                    const text = await file.text()
-                    let eventsToInsert: any[] = []
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+                <label className="btn btn-secondary" style={{ cursor: 'pointer', textAlign: 'center', padding: '8px 16px', fontSize: '12px', flex: 1, border: '1px dashed var(--border)' }}>
+                  {codesBusy ? 'Processing...' : 'Choose File'}
+                  <input 
+                    type="file" 
+                    accept=".csv,.ics"
+                    disabled={codesBusy}
+                    style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file || !sessionToken || !calendarUuid) return
+                      
+                      setCodesBusy(true) // Reusing this busy flag for imports temporarily
+                      try {
+                        const text = await file.text()
+                        let eventsToInsert: any[] = []
 
-                    if (file.name.endsWith('.csv')) {
-                      // Dynamically import papaparse to keep bundle small if unused
-                      const Papa = (await import('papaparse')).default
-                      const parsed = Papa.parse(text, { header: true, skipEmptyLines: true })
-                      
-                      eventsToInsert = parsed.data.map((row: any) => ({
-                        calendar_id: calendarUuid,
-                        title: row['Title'] || 'Untitled Event',
-                        event_date: row['Date'] || new Date().toISOString().split('T')[0],
-                        start_time: row['Start Time'] ? row['Start Time'].slice(0, 5) : null,
-                        end_time: row['End Time'] ? row['End Time'].slice(0, 5) : null,
-                        note: row['Notes'] || null,
-                        mood: row['Mood'] || 'chill',
-                        creator_name: 'Import' // Track that these were imported
-                      }))
-                    } else if (file.name.endsWith('.ics')) {
-                      // Dynamically import ical.js
-                      const ICAL = (await import('ical.js')).default
-                      const jcalData = ICAL.parse(text)
-                      const comp = new ICAL.Component(jcalData)
-                      const vevents = comp.getAllSubcomponents('vevent')
-                      
-                      eventsToInsert = vevents.map(e => {
-                        const summary = e.getFirstPropertyValue('summary')
-                        const dtstart = e.getFirstPropertyValue('dtstart')
-                        let eventDate = new Date().toISOString().split('T')[0]
-                        let startTime = null
-                        
-                        if (dtstart) {
-                          const dtStr = dtstart.toString()
-                          eventDate = dtStr.split('T')[0]
-                          if (dtStr.includes('T')) {
-                            startTime = dtStr.split('T')[1].slice(0, 5)
-                          }
+                        if (file.name.endsWith('.csv')) {
+                          // Dynamically import papaparse to keep bundle small if unused
+                          const Papa = (await import('papaparse')).default
+                          const parsed = Papa.parse(text, { header: true, skipEmptyLines: true })
+                          
+                          eventsToInsert = parsed.data.map((row: any) => ({
+                            calendar_id: calendarUuid,
+                            title: row['Title'] || 'Untitled Event',
+                            event_date: row['Date'] || new Date().toISOString().split('T')[0],
+                            start_time: row['Start Time'] ? row['Start Time'].slice(0, 5) : null,
+                            end_time: row['End Time'] ? row['End Time'].slice(0, 5) : null,
+                            note: row['Notes'] || null,
+                            mood: row['Mood'] || 'chill',
+                            creator_name: 'Import' // Track that these were imported
+                          }))
+                        } else if (file.name.endsWith('.ics')) {
+                          // Dynamically import ical.js
+                          const ICAL = (await import('ical.js')).default
+                          const jcalData = ICAL.parse(text)
+                          const comp = new ICAL.Component(jcalData)
+                          const vevents = comp.getAllSubcomponents('vevent')
+                          
+                          eventsToInsert = vevents.map(e => {
+                            const summary = e.getFirstPropertyValue('summary')
+                            const dtstart = e.getFirstPropertyValue('dtstart')
+                            let eventDate = new Date().toISOString().split('T')[0]
+                            let startTime = null
+                            
+                            if (dtstart) {
+                              const dtStr = dtstart.toString()
+                              eventDate = dtStr.split('T')[0]
+                              if (dtStr.includes('T')) {
+                                startTime = dtStr.split('T')[1].slice(0, 5)
+                              }
+                            }
+
+                            return {
+                              calendar_id: calendarUuid,
+                              title: summary || 'Imported Event',
+                              event_date: eventDate,
+                              start_time: startTime,
+                              creator_name: 'Import'
+                            }
+                          })
                         }
 
-                        return {
-                          calendar_id: calendarUuid,
-                          title: summary || 'Imported Event',
-                          event_date: eventDate,
-                          start_time: startTime,
-                          creator_name: 'Import'
+                        if (eventsToInsert.length === 0) {
+                          throw new Error('No valid events found in file')
                         }
-                      })
-                    }
 
-                    if (eventsToInsert.length === 0) {
-                      throw new Error('No valid events found in file')
-                    }
+                        const ok = window.confirm(`Found ${eventsToInsert.length} events matching. Do you want to save them to the calendar?`)
+                        if (!ok) return
 
-                    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
-                      global: { headers: { Authorization: `Bearer ${sessionToken}` } },
-                    })
+                        const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+                          global: { headers: { Authorization: `Bearer ${sessionToken}` } },
+                        })
 
-                    const { error } = await authClient.from('events').insert(eventsToInsert)
-                    if (error) throw new Error(error.message)
+                        const { error } = await authClient.from('events').insert(eventsToInsert)
+                        if (error) throw new Error(error.message)
 
-                    alert(`Successfully imported ${eventsToInsert.length} events!`)
-                  } catch (err: any) {
-                    alert(`Import failed: ${err.message}`)
-                  } finally {
-                    e.target.value = ''
-                    setCodesBusy(false)
-                  }
-                }}
-              />
+                        alert(`Successfully stored ${eventsToInsert.length} events! Refresh the page to see them.`)
+                      } catch (err: any) {
+                        alert(`Import failed: ${err.message}`)
+                      } finally {
+                        e.target.value = ''
+                        setCodesBusy(false)
+                      }
+                    }}
+                  />
+                </label>
+              </div>
             </section>
           )}
 
